@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 (2025-12-17)
+
+- Release packaging: GoReleaser archive naming + Homebrew-friendly assets.
+
 ## 0.1.0 (2025-12-17)
 
 - Discovery: mDNS (`_musc/_musp/_musz/_mush`) + LSDP fallback; discovery cache.

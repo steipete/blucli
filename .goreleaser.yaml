@@ -7,7 +7,7 @@ before:
 
 builds:
   - id: blu
-    main: ./cmd/blu
+    main: ./cmd/blu/main.go
     binary: blu
     env:
       - CGO_ENABLED=0
