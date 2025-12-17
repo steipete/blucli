@@ -131,9 +131,31 @@ source <(blu completions bash)
 
 ## Spotify notes
 
-BluOS uses Spotify Connect. This CLI can control playback (play/pause/next/prev/volume) when Spotify is already playing on the player, but it can’t do “Spotify search + play track” without a separate Spotify Web API integration.
+BluOS uses Spotify Connect.
 
-If you want quick “play X” for Spotify: save a BluOS preset from Spotify, then `blu presets load <id>`.
+Instant “switch player into Spotify”:
+
+```bash
+blu spotify open
+```
+
+Optional: Spotify Web API integration (OAuth) for `blu spotify search` / `blu spotify play`:
+
+1. Create a Spotify developer app and add a redirect URL (default): `http://127.0.0.1:8974/callback`
+2. Set `SPOTIFY_CLIENT_ID` (or pass `--client-id`)
+3. Login:
+
+```bash
+blu spotify login
+```
+
+Then:
+
+```bash
+blu spotify play "Gareth Emery"
+```
+
+Fallback: save a BluOS preset from Spotify, then `blu presets load <id>`.
 
 ## Development
 

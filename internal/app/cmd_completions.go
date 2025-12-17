@@ -40,7 +40,7 @@ _blu_complete() {
 
   cmd="${COMP_WORDS[1]}"
   if [[ $COMP_CWORD -eq 1 ]]; then
-    COMPREPLY=( $(compgen -W "version completions devices status now watch play pause stop next prev shuffle repeat volume mute group queue presets browse playlists inputs tunein sleep diag doctor raw help" -- "$cur") )
+    COMPREPLY=( $(compgen -W "version completions devices status now watch play pause stop next prev shuffle repeat volume mute group queue presets browse playlists inputs tunein spotify sleep diag doctor raw help" -- "$cur") )
     return 0
   fi
 
@@ -114,6 +114,15 @@ _blu_complete() {
       else
         if [[ "$cur" == -* ]]; then
           COMPREPLY=( $(compgen -W "--pick --id" -- "$cur") )
+        fi
+      fi
+      ;;
+    spotify)
+      if [[ $COMP_CWORD -eq 2 ]]; then
+        COMPREPLY=( $(compgen -W "login logout open devices search play" -- "$cur") )
+      else
+        if [[ "$cur" == -* ]]; then
+          COMPREPLY=( $(compgen -W "--client-id --redirect --no-open --type --pick --market --wait --spotify-device --no-activate" -- "$cur") )
         fi
       fi
       ;;

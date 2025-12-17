@@ -63,15 +63,21 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return 2
 	}
 
-	cfg, err := config.Load(config.LoadOptions{Path: *flagConfigPath})
-	if err != nil {
-		fmt.Fprintf(stderr, "config: %v\n", err)
-		return 1
-	}
-
 	paths, err := config.Paths()
 	if err != nil {
 		fmt.Fprintf(stderr, "config paths: %v\n", err)
+		return 1
+	}
+	if resolved, err := config.ConfigPath(*flagConfigPath); err != nil {
+		fmt.Fprintf(stderr, "config path: %v\n", err)
+		return 1
+	} else {
+		paths.ConfigPath = resolved
+	}
+
+	cfg, err := config.Load(config.LoadOptions{Path: paths.ConfigPath})
+	if err != nil {
+		fmt.Fprintf(stderr, "config: %v\n", err)
 		return 1
 	}
 
@@ -87,8 +93,19 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		Stderr: stderr,
 	})
 
+	if len(cmdArgs) > 1 && (cmdArgs[1] == "-h" || cmdArgs[1] == "--help" || cmdArgs[1] == "help") {
+		if usageCommand(stdout, cmdArgs[0]) {
+			return 0
+		}
+		usage(stdout)
+		return 0
+	}
+
 	switch cmdArgs[0] {
 	case "help", "-h", "--help":
+		if len(cmdArgs) > 1 && usageCommand(stdout, cmdArgs[1]) {
+			return 0
+		}
 		usage(stdout)
 		return 0
 	case "version":
@@ -140,6 +157,8 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return cmdInputs(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
 	case "tunein":
 		return cmdTuneIn(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
+	case "spotify":
+		return cmdSpotify(ctx, out, paths, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
 	case "sleep":
 		return cmdSleep(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr))
 	case "diag":
@@ -180,12 +199,36 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  playlists [--service <name>] [--category <cat>] [--expr <search>]")
 	fmt.Fprintln(w, "  inputs [play <id>]")
 	fmt.Fprintln(w, "  tunein search|play [--pick <n>] [--id <id>] <query>")
+	fmt.Fprintln(w, "  spotify login|logout|open|devices|search|play")
 	fmt.Fprintln(w, "  sleep")
 	fmt.Fprintln(w, "  diag|doctor")
 	fmt.Fprintln(w, "  raw <path> [--param k=v ...] [--write]")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Env:")
 	fmt.Fprintln(w, "  BLU_DEVICE  default device id/alias")
+}
+
+func usageCommand(w io.Writer, cmd string) bool {
+	switch cmd {
+	case "devices":
+		fmt.Fprintln(w, "Usage:")
+		fmt.Fprintln(w, "  blu devices")
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "Notes:")
+		fmt.Fprintln(w, "  - Runs discovery and refreshes the discovery cache.")
+		return true
+	case "spotify":
+		fmt.Fprintln(w, "Usage:")
+		fmt.Fprintln(w, "  blu spotify login [--client-id <id>] [--redirect <url>] [--no-open]")
+		fmt.Fprintln(w, "  blu spotify logout")
+		fmt.Fprintln(w, "  blu spotify open")
+		fmt.Fprintln(w, "  blu spotify devices")
+		fmt.Fprintln(w, "  blu spotify search <query>")
+		fmt.Fprintln(w, "  blu spotify play [--type auto|artist|track] [--pick <n>] [--market US] [--wait <dur>] [--spotify-device <id>] [--no-activate] <query>")
+		return true
+	default:
+		return false
+	}
 }
 
 func traceWriter(traceHTTP, dryRun bool, stderr io.Writer) io.Writer {

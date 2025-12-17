@@ -99,6 +99,20 @@ func TestRunHelpCommand(t *testing.T) {
 	}
 }
 
+func TestRunDevicesHelp(t *testing.T) {
+	t.Parallel()
+
+	var out bytes.Buffer
+	var errOut bytes.Buffer
+	code := Run(context.Background(), []string{"devices", "--help"}, &out, &errOut)
+	if code != 0 {
+		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
+	}
+	if got := out.String(); got == "" || !bytes.Contains([]byte(got), []byte("blu devices")) {
+		t.Fatalf("stdout = %q; want devices usage", got)
+	}
+}
+
 func TestRunPlay(t *testing.T) {
 	t.Parallel()
 

@@ -5,11 +5,26 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Config struct {
 	DefaultDevice string            `json:"default_device,omitempty"`
 	Aliases       map[string]string `json:"aliases,omitempty"`
+	Spotify       SpotifyConfig     `json:"spotify,omitempty"`
+}
+
+type SpotifyConfig struct {
+	ClientID string       `json:"client_id,omitempty"`
+	Token    SpotifyToken `json:"token,omitempty"`
+}
+
+type SpotifyToken struct {
+	AccessToken  string    `json:"access_token,omitempty"`
+	RefreshToken string    `json:"refresh_token,omitempty"`
+	ExpiresAt    time.Time `json:"expires_at,omitempty"`
+	TokenType    string    `json:"token_type,omitempty"`
+	Scope        string    `json:"scope,omitempty"`
 }
 
 type LoadOptions struct {
@@ -70,6 +85,10 @@ func configPath(explicit string) (string, error) {
 		return "", err
 	}
 	return paths.ConfigPath, nil
+}
+
+func ConfigPath(explicit string) (string, error) {
+	return configPath(explicit)
 }
 
 func ensureParentDir(path string) error {

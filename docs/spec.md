@@ -13,7 +13,8 @@ Status: in progress.
 ## Non-goals
 
 - Fixed groups / surround / advanced settings flows (unless API docs stabilize).
-- Auth (API is unauthenticated on LAN).
+- Auth for BluOS API (it’s unauthenticated on LAN).
+- Full streaming-service parity (Spotify search/control requires separate OAuth + Web API; supported as an optional “bonus”).
 
 ## Progress checklist
 
@@ -31,6 +32,7 @@ Status: in progress.
 - [x] Sleep timer
 - [x] Diagnostics: `diag`, `doctor`
 - [x] Power-user: `raw` endpoint runner + `--dry-run`
+- [x] Optional: Spotify Web API integration (`blu spotify …`) for search + “play <artist>”
 - [x] Compare against BluShell/pyblu/BluOS Controller.app notes in spec
 - [x] Real-device verification (no-breakage, minimal disruption)
 
@@ -124,6 +126,7 @@ If multiple devices: error + ask user to pick `--device`.
 - `blu playlists [--service <name>] [--category <cat>] [--expr <search>]`
 - `blu inputs` (aka `radiobrowse Capture`)
 - `blu tunein search|play [--pick <n>] [--id <id>] <query>`
+- `blu spotify login|logout|open|devices|search|play`
 - `blu sleep` (cycles sleep timer)
 - `blu diag` / `blu doctor`
 - `blu raw <path> [--param k=v ...] [--write]` (power tool; `--write` blocked by `--dry-run`)
