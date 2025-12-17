@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"errors"
+	"flag"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/steipete/blucli/internal/bluos"
@@ -11,7 +13,7 @@ import (
 	"github.com/steipete/blucli/internal/output"
 )
 
-func cmdPlayback(ctx context.Context, out *output.Printer, cfg config.Config, cache config.DiscoveryCache, deviceArg string, allowDiscover bool, discoverTimeout, httpTimeout time.Duration, dryRun bool, trace io.Writer, verb string) int {
+func cmdPlayback(ctx context.Context, out *output.Printer, cfg config.Config, cache config.DiscoveryCache, deviceArg string, allowDiscover bool, discoverTimeout, httpTimeout time.Duration, dryRun bool, trace io.Writer, verb string, args []string) int {
 	device, resolveErr := resolveDevice(ctx, cfg, cache, deviceArg, allowDiscover, discoverTimeout)
 	if resolveErr != nil {
 		out.Errorf("device: %v", resolveErr)
@@ -23,14 +25,51 @@ func cmdPlayback(ctx context.Context, out *output.Printer, cfg config.Config, ca
 	var err error
 	switch verb {
 	case "play":
-		err = client.Play(ctx, bluos.PlayOptions{})
+		flags := flag.NewFlagSet("play", flag.ContinueOnError)
+		flags.SetOutput(out.Stderr())
+
+		var playURL string
+		var seekSeconds int
+		var id int
+		flags.StringVar(&playURL, "url", "", "play URL (stream)")
+		flags.IntVar(&seekSeconds, "seek", 0, "seek seconds")
+		flags.IntVar(&id, "id", 0, "play id")
+
+		if err := flags.Parse(args); err != nil {
+			return 2
+		}
+		rest := flags.Args()
+		if playURL == "" && len(rest) > 0 {
+			playURL = strings.Join(rest, " ")
+			playURL = strings.TrimSpace(playURL)
+		} else if playURL != "" && len(rest) > 0 {
+			out.Errorf("play: unexpected args: %q", strings.Join(rest, " "))
+			return 2
+		}
+		err = client.Play(ctx, bluos.PlayOptions{URL: playURL, SeekSeconds: seekSeconds, ID: id})
 	case "pause":
+		if len(args) > 0 {
+			out.Errorf("pause: unexpected args: %q", strings.Join(args, " "))
+			return 2
+		}
 		err = client.Pause(ctx, bluos.PauseOptions{})
 	case "stop":
+		if len(args) > 0 {
+			out.Errorf("stop: unexpected args: %q", strings.Join(args, " "))
+			return 2
+		}
 		err = client.Stop(ctx)
 	case "next":
+		if len(args) > 0 {
+			out.Errorf("next: unexpected args: %q", strings.Join(args, " "))
+			return 2
+		}
 		err = client.Skip(ctx)
 	case "prev":
+		if len(args) > 0 {
+			out.Errorf("prev: unexpected args: %q", strings.Join(args, " "))
+			return 2
+		}
 		err = client.Back(ctx)
 	default:
 		out.Errorf("unknown playback command: %q", verb)

@@ -51,6 +51,11 @@ _blu_complete() {
     watch)
       COMPREPLY=( $(compgen -W "status sync" -- "$cur") )
       ;;
+    play)
+      if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "--url --seek --id" -- "$cur") )
+      fi
+      ;;
     shuffle)
       COMPREPLY=( $(compgen -W "on off" -- "$cur") )
       ;;

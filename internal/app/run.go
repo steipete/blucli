@@ -117,7 +117,7 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	case "watch":
 		return cmdWatch(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
 	case "play", "pause", "stop", "next", "prev":
-		return cmdPlayback(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[0])
+		return cmdPlayback(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[0], cmdArgs[1:])
 	case "shuffle":
 		return cmdShuffle(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
 	case "repeat":
@@ -165,7 +165,8 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  devices")
 	fmt.Fprintln(w, "  status|now")
 	fmt.Fprintln(w, "  watch status|sync")
-	fmt.Fprintln(w, "  play|pause|stop|next|prev")
+	fmt.Fprintln(w, "  play [--url <url>] [--seek <seconds>] [--id <n>]")
+	fmt.Fprintln(w, "  pause|stop|next|prev")
 	fmt.Fprintln(w, "  shuffle on|off")
 	fmt.Fprintln(w, "  repeat off|track|queue")
 	fmt.Fprintln(w, "  volume get|set <0-100>|up|down")

@@ -122,6 +122,30 @@ func TestRunPlay(t *testing.T) {
 	}
 }
 
+func TestRunPlayWithURL(t *testing.T) {
+	t.Parallel()
+
+	gotURL := make(chan string, 1)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotURL <- r.URL.String()
+		w.Header().Set("Content-Type", "application/xml")
+		_, _ = w.Write([]byte(`<ok/>`))
+	}))
+	t.Cleanup(srv.Close)
+
+	cfgPath := writeTestConfig(t, srv.URL)
+
+	var out bytes.Buffer
+	var errOut bytes.Buffer
+	code := Run(context.Background(), []string{"--config", cfgPath, "--discover=false", "play", "--url", "http://example.com/stream.mp3"}, &out, &errOut)
+	if code != 0 {
+		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
+	}
+	if got := <-gotURL; got != "/Play?url=http%3A%2F%2Fexample.com%2Fstream.mp3" {
+		t.Fatalf("url = %q; want /Play?url=http%%3A%%2F%%2Fexample.com%%2Fstream.mp3", got)
+	}
+}
+
 func TestRunStatusDryRunAllowsReads(t *testing.T) {
 	t.Parallel()
 
