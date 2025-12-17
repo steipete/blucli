@@ -52,21 +52,48 @@ type StatusOptions struct {
 type Status struct {
 	XMLName xml.Name `xml:"status" json:"-"`
 
-	State string `xml:"state,attr" json:"state,omitempty"`
-	Name  string `xml:"name,attr" json:"name,omitempty"`
-	Model string `xml:"model,attr" json:"model,omitempty"`
+	State string `xml:"-" json:"state,omitempty"`
+	Name  string `xml:"-" json:"name,omitempty"`
+	Model string `xml:"-" json:"model,omitempty"`
 
-	Volume int     `xml:"volume,attr" json:"volume"`
-	DB     float64 `xml:"db,attr" json:"db,omitempty"`
-	Mute   BoolInt `xml:"mute,attr" json:"mute"`
+	Volume int     `xml:"-" json:"volume"`
+	DB     float64 `xml:"-" json:"db,omitempty"`
+	Mute   BoolInt `xml:"-" json:"mute"`
 
-	Secs int `xml:"secs,attr" json:"secs,omitempty"`
+	Secs int `xml:"-" json:"secs,omitempty"`
 
-	Title  string `xml:"title1,attr" json:"title,omitempty"`
-	Artist string `xml:"artist,attr" json:"artist,omitempty"`
-	Album  string `xml:"album,attr" json:"album,omitempty"`
+	Title  string `xml:"-" json:"title,omitempty"`
+	Artist string `xml:"-" json:"artist,omitempty"`
+	Album  string `xml:"-" json:"album,omitempty"`
 
-	ETag string `xml:"etag,attr" json:"etag,omitempty"`
+	ETag string `xml:"-" json:"etag,omitempty"`
+
+	StateAttr string `xml:"state,attr" json:"-"`
+	StateElem string `xml:"state" json:"-"`
+	NameAttr  string `xml:"name,attr" json:"-"`
+	NameElem  string `xml:"name" json:"-"`
+	ModelAttr string `xml:"model,attr" json:"-"`
+	ModelElem string `xml:"model" json:"-"`
+
+	VolumeAttr *int     `xml:"volume,attr" json:"-"`
+	VolumeElem *int     `xml:"volume" json:"-"`
+	DBAttr     *float64 `xml:"db,attr" json:"-"`
+	DBElem     *float64 `xml:"db" json:"-"`
+	MuteAttr   *BoolInt `xml:"mute,attr" json:"-"`
+	MuteElem   *BoolInt `xml:"mute" json:"-"`
+
+	SecsAttr *int `xml:"secs,attr" json:"-"`
+	SecsElem *int `xml:"secs" json:"-"`
+
+	TitleAttr  string `xml:"title1,attr" json:"-"`
+	TitleElem  string `xml:"title1" json:"-"`
+	ArtistAttr string `xml:"artist,attr" json:"-"`
+	ArtistElem string `xml:"artist" json:"-"`
+	AlbumAttr  string `xml:"album,attr" json:"-"`
+	AlbumElem  string `xml:"album" json:"-"`
+
+	ETagAttr string `xml:"etag,attr" json:"-"`
+	ETagElem string `xml:"etag" json:"-"`
 
 	AnyAttrs []xml.Attr `xml:",any,attr" json:"-"`
 }
@@ -89,7 +116,74 @@ func (c *Client) Status(ctx context.Context, opts StatusOptions) (Status, error)
 	if err := xml.NewDecoder(bytes.NewReader(data)).Decode(&status); err != nil {
 		return Status{}, err
 	}
+	status.normalize()
 	return status, nil
+}
+
+func (s *Status) normalize() {
+	if s.StateAttr != "" {
+		s.State = s.StateAttr
+	} else {
+		s.State = strings.TrimSpace(s.StateElem)
+	}
+
+	if s.NameAttr != "" {
+		s.Name = s.NameAttr
+	} else {
+		s.Name = strings.TrimSpace(s.NameElem)
+	}
+
+	if s.ModelAttr != "" {
+		s.Model = s.ModelAttr
+	} else {
+		s.Model = strings.TrimSpace(s.ModelElem)
+	}
+
+	if s.VolumeAttr != nil {
+		s.Volume = *s.VolumeAttr
+	} else if s.VolumeElem != nil {
+		s.Volume = *s.VolumeElem
+	}
+
+	if s.DBAttr != nil {
+		s.DB = *s.DBAttr
+	} else if s.DBElem != nil {
+		s.DB = *s.DBElem
+	}
+
+	if s.MuteAttr != nil {
+		s.Mute = *s.MuteAttr
+	} else if s.MuteElem != nil {
+		s.Mute = *s.MuteElem
+	}
+
+	if s.SecsAttr != nil {
+		s.Secs = *s.SecsAttr
+	} else if s.SecsElem != nil {
+		s.Secs = *s.SecsElem
+	}
+
+	if s.TitleAttr != "" {
+		s.Title = s.TitleAttr
+	} else {
+		s.Title = strings.TrimSpace(s.TitleElem)
+	}
+	if s.ArtistAttr != "" {
+		s.Artist = s.ArtistAttr
+	} else {
+		s.Artist = strings.TrimSpace(s.ArtistElem)
+	}
+	if s.AlbumAttr != "" {
+		s.Album = s.AlbumAttr
+	} else {
+		s.Album = strings.TrimSpace(s.AlbumElem)
+	}
+
+	if s.ETagAttr != "" {
+		s.ETag = s.ETagAttr
+	} else {
+		s.ETag = strings.TrimSpace(s.ETagElem)
+	}
 }
 
 type SyncStatusOptions struct {
@@ -366,14 +460,26 @@ func (c *Client) get(ctx context.Context, path string, query url.Values, mutatin
 type BoolInt bool
 
 func (b *BoolInt) UnmarshalXMLAttr(attr xml.Attr) error {
-	v := strings.TrimSpace(strings.ToLower(attr.Value))
+	return b.parse(attr.Value)
+}
+
+func (b *BoolInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v string
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	}
+	return b.parse(v)
+}
+
+func (b *BoolInt) parse(raw string) error {
+	v := strings.TrimSpace(strings.ToLower(raw))
 	switch v {
 	case "1", "true", "yes", "on":
 		*b = true
 	case "0", "false", "no", "off", "":
 		*b = false
 	default:
-		return fmt.Errorf("invalid bool: %q", attr.Value)
+		return fmt.Errorf("invalid bool: %q", raw)
 	}
 	return nil
 }

@@ -37,6 +37,43 @@ func TestStatusParsingMuteInt(t *testing.T) {
 	}
 }
 
+func TestStatusParsingElements(t *testing.T) {
+	t.Parallel()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/Status" {
+			t.Fatalf("path = %q; want /Status", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/xml")
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+<status etag="123"><db>-58.5</db><mute>0</mute><state>stop</state><volume>5</volume></status>`))
+	}))
+	t.Cleanup(srv.Close)
+
+	baseURL, _ := url.Parse(srv.URL)
+	client := NewClient(baseURL, Options{Timeout: 2 * time.Second})
+
+	status, err := client.Status(context.Background(), StatusOptions{})
+	if err != nil {
+		t.Fatalf("Status() err = %v", err)
+	}
+	if status.State != "stop" {
+		t.Fatalf("State = %q; want stop", status.State)
+	}
+	if status.Volume != 5 {
+		t.Fatalf("Volume = %d; want 5", status.Volume)
+	}
+	if bool(status.Mute) {
+		t.Fatalf("Mute = %v; want false", status.Mute)
+	}
+	if status.DB != -58.5 {
+		t.Fatalf("DB = %v; want -58.5", status.DB)
+	}
+	if status.ETag != "123" {
+		t.Fatalf("ETag = %q; want 123", status.ETag)
+	}
+}
+
 func TestVolumeSetRequest(t *testing.T) {
 	t.Parallel()
 
