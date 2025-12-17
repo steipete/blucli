@@ -2,15 +2,20 @@ package main
 
 import (
 	"context"
+	"io"
 	"os"
 
 	"github.com/steipete/blucli/internal/app"
 )
 
 var version = "dev"
+var exit = os.Exit
+
+func runMain(ctx context.Context, args []string, stdout, stderr io.Writer) int {
+	app.Version = version
+	return app.Run(ctx, args, stdout, stderr)
+}
 
 func main() {
-	app.Version = version
-	ctx := context.Background()
-	os.Exit(app.Run(ctx, os.Args[1:], os.Stdout, os.Stderr))
+	exit(runMain(context.Background(), os.Args[1:], os.Stdout, os.Stderr))
 }
