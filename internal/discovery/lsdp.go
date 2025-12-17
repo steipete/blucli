@@ -100,6 +100,7 @@ func discoverLSDP(ctx context.Context) ([]Device, error) {
 						port = parsed
 					}
 				}
+				name := lsdpDeviceName(record.TXT)
 				host := announce.Address.String()
 				id := net.JoinHostPort(host, fmt.Sprintf("%d", port))
 				if _, exists := seen[id]; exists {
@@ -109,6 +110,7 @@ func discoverLSDP(ctx context.Context) ([]Device, error) {
 					ID:      id,
 					Host:    host,
 					Port:    port,
+					Name:    name,
 					Type:    classToType(record.Class),
 					Version: record.TXT["version"],
 					Source:  "lsdp",
@@ -278,6 +280,15 @@ func classToType(class uint16) string {
 	default:
 		return ""
 	}
+}
+
+func lsdpDeviceName(txt map[string]string) string {
+	for _, k := range []string{"name", "device", "devname", "playername", "player", "friendly_name", "label"} {
+		if v := txt[k]; v != "" {
+			return v
+		}
+	}
+	return ""
 }
 
 func interfaceBroadcastIPs() []net.IP {

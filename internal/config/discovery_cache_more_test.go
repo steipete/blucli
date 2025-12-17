@@ -56,6 +56,28 @@ func TestDiscoveryCache_SaveLoadLookup(t *testing.T) {
 	}
 }
 
+func TestDiscoveryCache_FindByName(t *testing.T) {
+	t.Parallel()
+
+	cache := NewDiscoveryCache(time.Now(), []Device{
+		{Host: "127.0.0.1", Port: 11000, Name: "Schlafzimmer"},
+		{Host: "127.0.0.2", Port: 11000, Name: "Kitchen"},
+		{Host: "127.0.0.3", Port: 11000, Name: "Kitchen"}, // duplicate name
+	})
+
+	if ms := cache.FindByName("schlafzimmer"); len(ms) != 1 || ms[0].Host != "127.0.0.1" {
+		t.Fatalf("matches=%v", ms)
+	}
+
+	if ms := cache.FindByName("kit"); len(ms) != 2 {
+		t.Fatalf("matches=%v", ms)
+	}
+
+	if ms := cache.FindByName("  "); len(ms) != 0 {
+		t.Fatalf("matches=%v", ms)
+	}
+}
+
 func TestLoadDiscoveryCache_InvalidJSON(t *testing.T) {
 	t.Parallel()
 

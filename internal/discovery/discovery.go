@@ -15,6 +15,7 @@ type Device struct {
 	ID      string `json:"id"`
 	Host    string `json:"host"`
 	Port    int    `json:"port"`
+	Name    string `json:"name,omitempty"`
 	Type    string `json:"type"`
 	Version string `json:"version,omitempty"`
 	Source  string `json:"source,omitempty"`
@@ -193,10 +194,16 @@ func deviceFromEntry(entry *zeroconf.ServiceEntry) (Device, bool) {
 	typ = strings.TrimPrefix(typ, "_")
 	typ = strings.TrimSuffix(typ, "._tcp")
 
+	name := strings.TrimSpace(entry.Instance)
+	if name == "" {
+		name = strings.TrimSuffix(strings.TrimSpace(entry.HostName), ".")
+	}
+
 	return Device{
 		ID:      id,
 		Host:    host,
 		Port:    entry.Port,
+		Name:    name,
 		Type:    typ,
 		Version: parseTXT(entry.Text)["version"],
 	}, true

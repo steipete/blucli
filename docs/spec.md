@@ -87,7 +87,7 @@ Endpoints used by `blu`:
 
 ### Global flags
 
-- `--device <id|alias>`: `host[:port]` or alias from config.
+- `--device <id|name|alias>`: `host[:port]`, discovery name, or alias from config.
 - `--json`: JSON output (stable for scripting).
 - `--timeout <dur>`: HTTP timeout.
 - `--dry-run`: block mutating endpoints (still allows reads); use for safe verification.

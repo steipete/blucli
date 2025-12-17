@@ -29,6 +29,32 @@ func TestResolveDevice_ArgAliasAndCache(t *testing.T) {
 	}
 }
 
+func TestResolveDevice_ArgNameFromCache(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.Config{Aliases: map[string]string{}}
+	cache := config.NewDiscoveryCache(time.Now(), []config.Device{{Host: "127.0.0.1", Port: 11000, Name: "Schlafzimmer"}})
+
+	d, err := resolveDevice(context.Background(), cfg, cache, "schlafzimmer", false, 0)
+	if err != nil || d.Host != "127.0.0.1" || d.Port != 11000 {
+		t.Fatalf("d=%+v err=%v", d, err)
+	}
+}
+
+func TestResolveDevice_ArgNameAmbiguousFromCache(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.Config{Aliases: map[string]string{}}
+	cache := config.NewDiscoveryCache(time.Now(), []config.Device{
+		{Host: "127.0.0.1", Port: 11000, Name: "Kitchen"},
+		{Host: "127.0.0.2", Port: 11000, Name: "Kitchen"},
+	})
+
+	if _, err := resolveDevice(context.Background(), cfg, cache, "kitchen", false, 0); err == nil {
+		t.Fatalf("want error")
+	}
+}
+
 func TestResolveDevice_UsesEnvBLUDevice(t *testing.T) {
 	t.Setenv("BLU_DEVICE", "192.0.2.2:11001")
 
@@ -95,5 +121,21 @@ func TestResolveDevice_DiscoveryPaths(t *testing.T) {
 		if _, err := resolveDevice(ctx, cfg, config.DiscoveryCache{}, "", true, 250*time.Millisecond); err == nil {
 			t.Fatalf("want error")
 		}
+	}
+}
+
+func TestResolveDevice_ArgNameFromDiscovery(t *testing.T) {
+	t.Parallel()
+
+	cfg := config.Config{Aliases: map[string]string{}}
+
+	ctx := discovery.WithMDNSOverride(context.Background(), func(context.Context) ([]discovery.Device, error) {
+		return []discovery.Device{{ID: "a", Host: "127.0.0.9", Port: 11000, Name: "Schlafzimmer"}}, nil
+	})
+	ctx = discovery.WithLSDPOverride(ctx, func(context.Context) ([]discovery.Device, error) { return nil, nil })
+
+	d, err := resolveDevice(ctx, cfg, config.DiscoveryCache{}, "Schlafzimmer", true, 250*time.Millisecond)
+	if err != nil || d.Host != "127.0.0.9" || d.Port != 11000 {
+		t.Fatalf("d=%+v err=%v", d, err)
 	}
 }

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
+	"unicode"
 )
 
 type DiscoveryCache struct {
@@ -61,4 +63,46 @@ func (c DiscoveryCache) Lookup(idOrHostPort string) (Device, bool) {
 		}
 	}
 	return Device{}, false
+}
+
+func (c DiscoveryCache) FindByName(query string) []Device {
+	q := normalizeName(query)
+	if q == "" {
+		return nil
+	}
+
+	var exact []Device
+	var fuzzy []Device
+	for _, device := range c.Devices {
+		n := normalizeName(device.Name)
+		if n == "" {
+			continue
+		}
+		if n == q {
+			exact = append(exact, device)
+			continue
+		}
+		if strings.Contains(n, q) || strings.Contains(q, n) {
+			fuzzy = append(fuzzy, device)
+		}
+	}
+	if len(exact) > 0 {
+		return exact
+	}
+	return fuzzy
+}
+
+func normalizeName(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return ""
+	}
+	var b strings.Builder
+	b.Grow(len(s))
+	for _, r := range strings.ToLower(s) {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }

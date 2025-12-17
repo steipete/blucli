@@ -12,6 +12,8 @@ type Device struct {
 	ID   string `json:"id"`
 	Host string `json:"host"`
 	Port int    `json:"port"`
+	Name string `json:"name,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 
 func (d Device) BaseURL() *url.URL {

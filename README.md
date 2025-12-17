@@ -13,7 +13,7 @@ Spec: [docs/spec.md](docs/spec.md)
 ## Features
 
 - Discovery: mDNS (`_musc/_musp/_musz/_mush`) + LSDP fallback (`blu devices`)
-- Device selection: `--device`, `BLU_DEVICE`, config `default_device`, aliases
+- Device selection: `--device`, `BLU_DEVICE`, config `default_device`, aliases, discovery names
 - Playback: `play/pause/stop/next/prev` + `play --url/--seek/--id`
 - Volume + modes: `volume …`, `mute …`, `shuffle …`, `repeat …`
 - Grouping: `group status|add|remove`
@@ -37,7 +37,7 @@ blu --device 192.168.1.19:11000 status
 
 `blu` picks a target device in this order:
 
-1. `--device <id|alias>` (e.g. `192.168.1.19:11000` or alias like `kitchen`)
+1. `--device <id|name|alias>` (e.g. `192.168.1.19:11000` or `Schlafzimmer`)
 2. `BLU_DEVICE`
 3. config `default_device`
 4. discovery cache / live discovery (only if exactly 1 device)
@@ -45,6 +45,8 @@ blu --device 192.168.1.19:11000 status
 If multiple devices exist, run `blu devices` and pick one.
 
 ## Config (aliases)
+
+You can also target a player by its discovery name (shown by `blu devices`) without writing a config file. Aliases are just for custom shortcuts / disambiguation.
 
 Config file:
 - macOS: `~/Library/Application Support/blu/config.json`

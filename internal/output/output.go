@@ -88,6 +88,11 @@ func (p *Printer) printDevices(devices []discovery.Device) {
 		if d.Version != "" {
 			extra = " v" + d.Version
 		}
+		name := strings.TrimSpace(d.Name)
+		if name != "" {
+			fmt.Fprintf(p.stdout, "%s  %s (%s)%s\n", name, d.ID, d.Type, extra)
+			continue
+		}
 		fmt.Fprintf(p.stdout, "%s (%s)%s\n", d.ID, d.Type, extra)
 	}
 }

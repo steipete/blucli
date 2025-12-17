@@ -29,7 +29,7 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	global.SetOutput(stderr)
 
 	var (
-		flagDevice     = global.String("device", "", "device id/alias (host[:port] or alias)")
+		flagDevice     = global.String("device", "", "device id/name/alias (host[:port], discovery name, or alias)")
 		flagJSON       = global.Bool("json", false, "json output")
 		flagTimeout    = global.Duration("timeout", defaultHTTPTimeout, "http timeout")
 		flagDryRun     = global.Bool("dry-run", false, "log requests; block mutating requests")
@@ -178,7 +178,7 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "blu — BluOS CLI")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Usage:")
-	fmt.Fprintln(w, "  blu [--help] [--version] [--device <id|alias>] [--json] <command> [args]")
+	fmt.Fprintln(w, "  blu [--help] [--version] [--device <id|name|alias>] [--json] <command> [args]")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Commands:")
 	fmt.Fprintln(w, "  version")
@@ -205,7 +205,7 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  raw <path> [--param k=v ...] [--write]")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Env:")
-	fmt.Fprintln(w, "  BLU_DEVICE  default device id/alias")
+	fmt.Fprintln(w, "  BLU_DEVICE  default device id/name/alias")
 }
 
 func usageCommand(w io.Writer, cmd string) bool {

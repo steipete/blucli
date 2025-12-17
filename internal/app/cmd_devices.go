@@ -29,6 +29,8 @@ func cmdDevices(ctx context.Context, out *output.Printer, paths config.PathSet, 
 			ID:   device.ID,
 			Host: device.Host,
 			Port: device.Port,
+			Name: device.Name,
+			Type: device.Type,
 		})
 	}
 	newCache := config.NewDiscoveryCache(now, cacheDevices)
