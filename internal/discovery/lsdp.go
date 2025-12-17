@@ -14,8 +14,21 @@ const lsdpPort = 11430
 
 var lsdpClasses = []uint16{0x0001, 0x0003, 0x0006, 0x0008}
 
+type lsdpPortOverrideKey struct{}
+
+func WithLSDPPortOverride(ctx context.Context, port int) context.Context {
+	return context.WithValue(ctx, lsdpPortOverrideKey{}, port)
+}
+
 func discoverLSDP(ctx context.Context) ([]Device, error) {
-	conn, err := net.ListenUDP("udp4", &net.UDPAddr{IP: net.IPv4zero, Port: lsdpPort})
+	port := lsdpPort
+	if v := ctx.Value(lsdpPortOverrideKey{}); v != nil {
+		if p, ok := v.(int); ok && p > 0 && p <= 65535 {
+			port = p
+		}
+	}
+
+	conn, err := net.ListenUDP("udp4", &net.UDPAddr{IP: net.IPv4zero, Port: port})
 	if err != nil {
 		// Port may be in use (BluOS Controller) or blocked; treat as soft failure.
 		return nil, err
@@ -41,7 +54,7 @@ func discoverLSDP(ctx context.Context) ([]Device, error) {
 				return
 			case <-timer.C:
 				for _, dst := range broadcastIPs {
-					_, _ = conn.WriteToUDP(query, &net.UDPAddr{IP: dst, Port: lsdpPort})
+					_, _ = conn.WriteToUDP(query, &net.UDPAddr{IP: dst, Port: port})
 				}
 			}
 		}

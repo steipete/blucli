@@ -22,6 +22,19 @@ type Device struct {
 
 var serviceTypes = []string{"musc", "musp", "musz", "mush"}
 
+type DiscoverFunc func(context.Context) ([]Device, error)
+
+type mdnsOverrideKey struct{}
+type lsdpOverrideKey struct{}
+
+func WithMDNSOverride(ctx context.Context, fn DiscoverFunc) context.Context {
+	return context.WithValue(ctx, mdnsOverrideKey{}, fn)
+}
+
+func WithLSDPOverride(ctx context.Context, fn DiscoverFunc) context.Context {
+	return context.WithValue(ctx, lsdpOverrideKey{}, fn)
+}
+
 func Discover(ctx context.Context) ([]Device, error) {
 	var (
 		mdnsDevices []Device
@@ -30,15 +43,29 @@ func Discover(ctx context.Context) ([]Device, error) {
 		lsdpErr     error
 	)
 
+	mdnsFn := discoverMDNS
+	if v := ctx.Value(mdnsOverrideKey{}); v != nil {
+		if fn, ok := v.(DiscoverFunc); ok && fn != nil {
+			mdnsFn = fn
+		}
+	}
+
+	lsdpFn := discoverLSDP
+	if v := ctx.Value(lsdpOverrideKey{}); v != nil {
+		if fn, ok := v.(DiscoverFunc); ok && fn != nil {
+			lsdpFn = fn
+		}
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		mdnsDevices, mdnsErr = discoverMDNS(ctx)
+		mdnsDevices, mdnsErr = mdnsFn(ctx)
 	}()
 	go func() {
 		defer wg.Done()
-		lsdpDevices, lsdpErr = discoverLSDP(ctx)
+		lsdpDevices, lsdpErr = lsdpFn(ctx)
 	}()
 	wg.Wait()
 
