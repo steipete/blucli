@@ -20,6 +20,7 @@ blu devices
 blu --device kitchen status
 blu --json status
 blu play
+blu play --url http://ice1.somafm.com/groovesalad-128-mp3
 blu volume set 15
 blu --dry-run --trace-http queue clear
 blu group add office --name "Downstairs"
