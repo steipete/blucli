@@ -1,4 +1,5 @@
 version: 2
+project_name: blucli
 
 before:
   hooks:
@@ -24,6 +25,11 @@ archives:
   - id: default
     builds:
       - blu
+    name_template: >-
+      {{ .ProjectName }}-{{- if eq .Os "darwin" -}}macos{{- else if eq .Os "windows" -}}windows{{- else -}}{{ .Os }}{{- end -}}-{{ .Arch }}
+    files:
+      - LICENSE
+      - README.md
     format_overrides:
       - goos: windows
         format: zip

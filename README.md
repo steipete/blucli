@@ -1,24 +1,35 @@
-# blucli
+# 🫐 blucli — play, group, and automate BluOS.
 
 BluOS CLI (`blu`) for Bluesound/NAD BluOS players.
 
 Spec: `docs/spec.md`
 
-## Install
+## Install / Run
 
-```bash
-go install github.com/steipete/blucli/cmd/blu@latest
-```
+- Homebrew (installs `blu`): `brew install steipete/tap/blucli`
+- Go install: `go install github.com/steipete/blucli/cmd/blu@latest`
+- From source: `go run ./cmd/blu --help`
 
-Or grab a prebuilt binary from GitHub Releases.
+## Features
+
+- Discovery: mDNS (`_musc/_musp/_musz/_mush`) + LSDP fallback (`blu devices`)
+- Device selection: `--device`, `BLU_DEVICE`, config `default_device`, aliases
+- Playback: `play/pause/stop/next/prev` + `play --url/--seek/--id`
+- Volume + modes: `volume …`, `mute …`, `shuffle …`, `repeat …`
+- Grouping: `group status|add|remove`
+- Queue/presets/browse: `queue …`, `presets …`, `browse …`, `playlists …`, `inputs …`
+- TuneIn: `tunein search|play` for quick “play X”
+- Spotify Connect: `spotify open` (and optional Web API `spotify login/search/play`)
+- Watch: long-poll `Status` / `SyncStatus` (`watch status|sync`)
+- Scripting/safety: `--json`, `--dry-run`, `--trace-http`
+- Diagnostics: `diag`, `doctor`, `raw` endpoint runner
+- Shell completions: `completions bash|zsh`
 
 ## Quickstart
 
 ```bash
 blu devices
 blu --device 192.168.1.19:11000 status
-
-blu --json status
 ```
 
 ## Device selection
@@ -36,6 +47,7 @@ If multiple devices exist, run `blu devices` and pick one.
 
 Config file:
 - macOS: `~/Library/Application Support/blu/config.json`
+- Linux: `~/.config/blu/config.json`
 
 Example:
 
