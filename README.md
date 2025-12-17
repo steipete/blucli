@@ -2,7 +2,7 @@
 
 BluOS CLI (`blu`) for Bluesound/NAD BluOS players.
 
-Spec: `docs/spec.md`
+Spec: [docs/spec.md](docs/spec.md)
 
 ## Install / Run
 
