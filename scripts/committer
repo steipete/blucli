@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "usage: $0 \"type: message\" <path...>" >&2
+  exit 2
+fi
+
+msg="$1"
+shift
+
+git add -- "$@"
+git commit -m "$msg" -- "$@"
+
