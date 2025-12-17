@@ -34,6 +34,8 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		flagTimeout    = global.Duration("timeout", defaultHTTPTimeout, "http timeout")
 		flagDryRun     = global.Bool("dry-run", false, "log requests; block mutating requests")
 		flagTraceHTTP  = global.Bool("trace-http", false, "log HTTP requests to stderr")
+		flagHelp       = global.Bool("help", false, "print help")
+		flagH          = global.Bool("h", false, "print help")
 		flagVersion    = global.Bool("version", false, "print version")
 		flagV          = global.Bool("v", false, "print version")
 		flagDiscover   = global.Bool("discover", true, "allow discovery when needed")
@@ -43,6 +45,11 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 
 	if err := global.Parse(args); err != nil {
 		return 2
+	}
+
+	if *flagHelp || *flagH {
+		usage(stdout)
+		return 0
 	}
 
 	if *flagVersion || *flagV {
@@ -150,7 +157,7 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "blu — BluOS CLI")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Usage:")
-	fmt.Fprintln(w, "  blu [--device <id|alias>] [--json] <command> [args]")
+	fmt.Fprintln(w, "  blu [--help] [--version] [--device <id|alias>] [--json] <command> [args]")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Commands:")
 	fmt.Fprintln(w, "  version")

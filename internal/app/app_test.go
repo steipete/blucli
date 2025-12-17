@@ -70,6 +70,34 @@ func TestRunVersionFlag(t *testing.T) {
 	}
 }
 
+func TestRunHelpFlag(t *testing.T) {
+	t.Parallel()
+
+	var out bytes.Buffer
+	var errOut bytes.Buffer
+	code := Run(context.Background(), []string{"--help"}, &out, &errOut)
+	if code != 0 {
+		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
+	}
+	if got := out.String(); got == "" || !bytes.Contains([]byte(got), []byte("blu — BluOS CLI")) {
+		t.Fatalf("stdout = %q; want usage", got)
+	}
+}
+
+func TestRunHelpCommand(t *testing.T) {
+	t.Parallel()
+
+	var out bytes.Buffer
+	var errOut bytes.Buffer
+	code := Run(context.Background(), []string{"help"}, &out, &errOut)
+	if code != 0 {
+		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
+	}
+	if got := out.String(); got == "" || !bytes.Contains([]byte(got), []byte("Usage:")) {
+		t.Fatalf("stdout = %q; want usage", got)
+	}
+}
+
 func TestRunPlay(t *testing.T) {
 	t.Parallel()
 
