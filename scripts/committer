@@ -10,5 +10,9 @@ msg="$1"
 shift
 
 git add -- "$@"
-git commit -m "$msg" -- "$@"
+if git diff --cached --quiet; then
+  echo "nothing to commit" >&2
+  exit 1
+fi
 
+git commit -m "$msg"
