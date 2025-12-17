@@ -20,6 +20,7 @@ Spec: `docs/spec.md`
 - Queue/presets/browse: `queue …`, `presets …`, `browse …`, `playlists …`, `inputs …`
 - TuneIn: `tunein search|play` for quick “play X”
 - Spotify Connect: `spotify open` (and optional Web API `spotify login/search/play`)
+- Sleep timer: `sleep`
 - Watch: long-poll `Status` / `SyncStatus` (`watch status|sync`)
 - Scripting/safety: `--json`, `--dry-run`, `--trace-http`
 - Diagnostics: `diag`, `doctor`, `raw` endpoint runner
