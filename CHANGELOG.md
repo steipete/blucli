@@ -4,6 +4,10 @@
 
 - Release packaging: GoReleaser archive naming + Homebrew-friendly assets.
 
+## 0.1.2 (2025-12-17)
+
+- Packaging fix: stop ignoring `cmd/blu` in `.gitignore` (needed for `go install` + releases).
+
 ## 0.1.0 (2025-12-17)
 
 - Discovery: mDNS (`_musc/_musp/_musz/_mush`) + LSDP fallback; discovery cache.

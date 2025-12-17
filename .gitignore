@@ -7,7 +7,7 @@
 *.dll
 *.so
 *.dylib
-blu
+/blu
 
 # Test binary, built with `go test -c`
 *.test
