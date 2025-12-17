@@ -8,8 +8,10 @@ import (
 	"github.com/steipete/blucli/internal/app"
 )
 
-var version = "dev"
-var exit = os.Exit
+var (
+	version = "dev"
+	exit    = os.Exit
+)
 
 func runMain(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	app.Version = version

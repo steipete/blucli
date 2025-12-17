@@ -24,8 +24,10 @@ var serviceTypes = []string{"musc", "musp", "musz", "mush"}
 
 type DiscoverFunc func(context.Context) ([]Device, error)
 
-type mdnsOverrideKey struct{}
-type lsdpOverrideKey struct{}
+type (
+	mdnsOverrideKey struct{}
+	lsdpOverrideKey struct{}
+)
 
 func WithMDNSOverride(ctx context.Context, fn DiscoverFunc) context.Context {
 	return context.WithValue(ctx, mdnsOverrideKey{}, fn)
