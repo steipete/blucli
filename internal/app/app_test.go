@@ -40,8 +40,6 @@ func TestRunStatus(t *testing.T) {
 }
 
 func TestRunVersionCommand(t *testing.T) {
-	t.Parallel()
-
 	Version = "v0.0.0-test"
 
 	var out bytes.Buffer
@@ -56,8 +54,6 @@ func TestRunVersionCommand(t *testing.T) {
 }
 
 func TestRunVersionFlag(t *testing.T) {
-	t.Parallel()
-
 	Version = "v0.0.0-test"
 
 	var out bytes.Buffer
