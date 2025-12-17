@@ -184,6 +184,23 @@ func (p *Printer) printPlaylists(pl bluos.Playlists) {
 }
 
 func (p *Printer) printRadioBrowse(rb bluos.RadioBrowse) {
+	if len(rb.Categories) > 0 {
+		for _, cat := range rb.Categories {
+			label := strings.TrimSpace(cat.Text)
+			if label == "" {
+				label = "Category"
+			}
+			fmt.Fprintln(p.stdout, label+":")
+			for _, item := range cat.Items {
+				text := strings.TrimSpace(item.Text)
+				if text == "" {
+					text = item.ID
+				}
+				fmt.Fprintf(p.stdout, "  %s  %s\n", item.ID, text)
+			}
+		}
+		return
+	}
 	if len(rb.Items) == 0 {
 		fmt.Fprintln(p.stdout, "no inputs")
 		return

@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 	"testing"
 )
@@ -307,6 +308,38 @@ func TestRunRawParsesFlagsAfterPath(t *testing.T) {
 	}
 	if got := out.String(); got == "" || !bytes.Contains([]byte(got), []byte(`"path": "/Status"`)) {
 		t.Fatalf("stdout = %q; want contains \"path\": \"/Status\"", got)
+	}
+}
+
+func TestRunTuneInSearch(t *testing.T) {
+	t.Parallel()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/RadioBrowse" {
+			http.NotFound(w, r)
+			return
+		}
+		if got := r.URL.Query().Get("service"); got != "TuneIn" {
+			t.Fatalf("service = %q; want TuneIn", got)
+		}
+		if got := r.URL.Query().Get("expr"); got != "Garrett" {
+			t.Fatalf("expr = %q; want Garrett", got)
+		}
+		w.Header().Set("Content-Type", "application/xml")
+		_, _ = w.Write([]byte(`<radiotime service="TuneIn"><category text="Stations"><item id="s1" text="X" type="audio" URL="TuneIn%3As1"/></category></radiotime>`))
+	}))
+	t.Cleanup(srv.Close)
+
+	cfgPath := writeTestConfig(t, srv.URL)
+
+	var out bytes.Buffer
+	var errOut bytes.Buffer
+	code := Run(context.Background(), []string{"--config", cfgPath, "--discover=false", "tunein", "search", "Garrett"}, &out, &errOut)
+	if code != 0 {
+		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
+	}
+	if got := out.String(); !strings.Contains(got, "Stations:") {
+		t.Fatalf("stdout = %q; want contains Stations:", got)
 	}
 }
 

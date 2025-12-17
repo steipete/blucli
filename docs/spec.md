@@ -123,6 +123,7 @@ If multiple devices: error + ask user to pick `--device`.
 - `blu browse --key <key> [--q <query>] [--context]`
 - `blu playlists [--service <name>] [--category <cat>] [--expr <search>]`
 - `blu inputs` (aka `radiobrowse Capture`)
+- `blu tunein search|play [--pick <n>] [--id <id>] <query>`
 - `blu sleep` (cycles sleep timer)
 - `blu diag` / `blu doctor`
 - `blu raw <path> [--param k=v ...] [--write]` (power tool; `--write` blocked by `--dry-run`)

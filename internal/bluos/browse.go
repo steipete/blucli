@@ -109,11 +109,19 @@ func (c *Client) Playlists(ctx context.Context, opts PlaylistsOptions) (Playlist
 
 type RadioBrowseOptions struct {
 	Service string
+	Expr    string
 }
 
 type RadioBrowse struct {
 	XMLName xml.Name `xml:"radiotime" json:"-"`
 	Service string   `xml:"service,attr" json:"service,omitempty"`
+
+	Categories []RadioCategory `xml:"category" json:"categories,omitempty"`
+	Items      []RadioItem     `xml:"item" json:"items,omitempty"`
+}
+
+type RadioCategory struct {
+	Text string `xml:"text,attr" json:"text,omitempty"`
 
 	Items []RadioItem `xml:"item" json:"items,omitempty"`
 }
@@ -134,6 +142,9 @@ type RadioItem struct {
 func (c *Client) RadioBrowse(ctx context.Context, opts RadioBrowseOptions) (RadioBrowse, error) {
 	q := url.Values{}
 	q.Set("service", opts.Service)
+	if opts.Expr != "" {
+		q.Set("expr", opts.Expr)
+	}
 
 	data, err := c.getRead(ctx, "/RadioBrowse", q)
 	if err != nil {

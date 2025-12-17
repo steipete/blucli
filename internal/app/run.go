@@ -138,6 +138,8 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return cmdPlaylists(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
 	case "inputs":
 		return cmdInputs(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
+	case "tunein":
+		return cmdTuneIn(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr), cmdArgs[1:])
 	case "sleep":
 		return cmdSleep(ctx, out, cfg, cache, *flagDevice, *flagDiscover, *flagDiscTO, *flagTimeout, *flagDryRun, traceWriter(*flagTraceHTTP, *flagDryRun, stderr))
 	case "diag":
@@ -177,6 +179,7 @@ func usage(w io.Writer) {
 	fmt.Fprintln(w, "  browse --key <key> [--q <query>] [--context]")
 	fmt.Fprintln(w, "  playlists [--service <name>] [--category <cat>] [--expr <search>]")
 	fmt.Fprintln(w, "  inputs [play <id>]")
+	fmt.Fprintln(w, "  tunein search|play [--pick <n>] [--id <id>] <query>")
 	fmt.Fprintln(w, "  sleep")
 	fmt.Fprintln(w, "  diag|doctor")
 	fmt.Fprintln(w, "  raw <path> [--param k=v ...] [--write]")

@@ -40,7 +40,7 @@ _blu_complete() {
 
   cmd="${COMP_WORDS[1]}"
   if [[ $COMP_CWORD -eq 1 ]]; then
-    COMPREPLY=( $(compgen -W "version completions devices status now watch play pause stop next prev shuffle repeat volume mute group queue presets browse playlists inputs sleep diag doctor raw help" -- "$cur") )
+    COMPREPLY=( $(compgen -W "version completions devices status now watch play pause stop next prev shuffle repeat volume mute group queue presets browse playlists inputs tunein sleep diag doctor raw help" -- "$cur") )
     return 0
   fi
 
@@ -106,6 +106,15 @@ _blu_complete() {
     inputs)
       if [[ $COMP_CWORD -eq 2 ]]; then
         COMPREPLY=( $(compgen -W "list play" -- "$cur") )
+      fi
+      ;;
+    tunein)
+      if [[ $COMP_CWORD -eq 2 ]]; then
+        COMPREPLY=( $(compgen -W "search play" -- "$cur") )
+      else
+        if [[ "$cur" == -* ]]; then
+          COMPREPLY=( $(compgen -W "--pick --id" -- "$cur") )
+        fi
       fi
       ;;
     raw)
