@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.1.4 (Unreleased)
+
 ## 0.1.3 (2025-12-17)
 
 - Device selection: accept discovery names for `--device`/`BLU_DEVICE` (no config aliases needed).
