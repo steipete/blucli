@@ -2,9 +2,11 @@ package bluos
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -35,5 +37,18 @@ func TestPlaylistParsing(t *testing.T) {
 	}
 	if pl.Songs[0].Title != "T1" || pl.Songs[1].Title != "T2" {
 		t.Fatalf("titles = %q,%q", pl.Songs[0].Title, pl.Songs[1].Title)
+	}
+}
+
+func TestPlaylistJSONIncludesLengthZero(t *testing.T) {
+	t.Parallel()
+
+	pl := Playlist{ID: 2, Length: 0, Modified: 0, Shuffle: 0, Repeat: 0}
+	b, err := json.Marshal(pl)
+	if err != nil {
+		t.Fatalf("Marshal err = %v", err)
+	}
+	if !strings.Contains(string(b), `"length":0`) {
+		t.Fatalf("json = %q; want contains length:0", string(b))
 	}
 }

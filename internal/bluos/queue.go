@@ -17,11 +17,11 @@ type PlaylistOptions struct {
 type Playlist struct {
 	XMLName  xml.Name `xml:"playlist" json:"-"`
 	Name     string   `xml:"name,attr" json:"name,omitempty"`
-	Modified int      `xml:"modified,attr" json:"modified,omitempty"`
-	Length   int      `xml:"length,attr" json:"length,omitempty"`
-	ID       int      `xml:"id,attr" json:"id,omitempty"`
-	Shuffle  int      `xml:"shuffle,attr" json:"shuffle,omitempty"`
-	Repeat   int      `xml:"repeat,attr" json:"repeat,omitempty"`
+	Modified int      `xml:"modified,attr" json:"modified"`
+	Length   int      `xml:"length,attr" json:"length"`
+	ID       int      `xml:"id,attr" json:"id"`
+	Shuffle  int      `xml:"shuffle,attr" json:"shuffle"`
+	Repeat   int      `xml:"repeat,attr" json:"repeat"`
 
 	Songs []PlaylistSong `xml:"song" json:"songs,omitempty"`
 
