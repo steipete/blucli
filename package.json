@@ -1,0 +1,13 @@
+{
+  "name": "@steipete/blucli",
+  "private": true,
+  "packageManager": "pnpm@10.25.0",
+  "scripts": {
+    "blu": "pnpm -s build && ./dist/blu",
+    "build": "mkdir -p dist && go build -o dist/blu ./cmd/blu",
+    "test": "go test ./...",
+    "lint": "golangci-lint run --timeout=5m",
+    "format": "gofumpt -w $(git ls-files '*.go') && golangci-lint run --fix --timeout=5m"
+  }
+}
+

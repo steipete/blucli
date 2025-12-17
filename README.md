@@ -15,6 +15,9 @@ Or grab a prebuilt binary from GitHub Releases.
 ## Usage
 
 ```bash
+pnpm blu -- --help
+pnpm blu -- devices
+
 blu version
 blu devices
 blu --device kitchen status
