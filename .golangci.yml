@@ -1,38 +1,33 @@
+version: 2
+
 run:
   timeout: 5m
   tests: true
 
-linters:
-  disable-all: true
+formatters:
   enable:
-    - bodyclose
-    - errcheck
-    - gofmt
     - gofumpt
     - goimports
+  settings:
+    gofumpt:
+      extra-rules: true
+    goimports:
+      local-prefixes: github.com/steipete/blucli
+
+linters:
+  disable-all: true
+  disable:
+    - errcheck
+  enable:
+    - bodyclose
     - govet
     - ineffassign
     - misspell
-    - revive
     - staticcheck
-    - typecheck
     - unconvert
     - unused
 
-linters-settings:
-  gofumpt:
-    extra-rules: true
-  goimports:
-    local-prefixes: github.com/steipete/blucli
-  revive:
-    rules:
-      - name: blank-imports
-      - name: early-return
-      - name: errorf
-      - name: exported
-        disabled: true
-      - name: var-naming
-        disabled: true
+linters-settings: {}
 
 issues:
   max-issues-per-linter: 0

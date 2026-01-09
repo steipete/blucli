@@ -20,6 +20,7 @@ builds:
       - linux_arm64
       - windows_amd64
       - windows_arm64
+      - windows_arm64
 
 archives:
   - id: default
