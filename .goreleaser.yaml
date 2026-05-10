@@ -20,11 +20,10 @@ builds:
       - linux_arm64
       - windows_amd64
       - windows_arm64
-      - windows_arm64
 
 archives:
   - id: default
-    builds:
+    ids:
       - blu
     name_template: >-
       {{ .ProjectName }}-{{- if eq .Os "darwin" -}}macos{{- else if eq .Os "windows" -}}windows{{- else -}}{{ .Os }}{{- end -}}-{{ .Arch }}
@@ -33,7 +32,8 @@ archives:
       - README.md
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
 
 checksum:
   name_template: checksums.txt

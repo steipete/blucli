@@ -2,6 +2,8 @@
 
 ## 0.1.4 (Unreleased)
 
+- Release config: update GoReleaser archive fields to current v2 names so `goreleaser check` passes.
+
 ## 0.1.3 (2025-12-17)
 
 - Device selection: accept discovery names for `--device`/`BLU_DEVICE` (no config aliases needed).
