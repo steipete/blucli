@@ -9,6 +9,14 @@ Spec: [docs/spec.md](docs/spec.md)
 - Homebrew (installs `blu`): `brew install steipete/tap/blucli`
 - Go install: `go install github.com/steipete/blucli/cmd/blu@latest`
 - From source: `go run ./cmd/blu --help`
+- Docker: `docker build -t blucli .`
+
+```bash
+docker run --rm --network host -v "$PWD/.blu:/data" blucli devices
+docker run --rm --network host -v "$PWD/.blu:/data" blucli --device 192.168.1.19:11000 status
+```
+
+Linux containers need host networking for discovery; otherwise pass an explicit `--device` or `BLU_DEVICE`.
 
 ## Features
 

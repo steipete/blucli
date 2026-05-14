@@ -2,6 +2,7 @@
 
 ## 0.1.4 (Unreleased)
 
+- Docker: add a local image with `/data` persistence and CI smoke coverage.
 - Release config: update GoReleaser archive fields to current v2 names so `goreleaser check` passes.
 - CI: pin Go toolchain to 1.25.10 to clear current standard-library `govulncheck` advisories.
 
