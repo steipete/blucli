@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.1.5 (Unreleased)
+
 ## 0.1.4 (2026-05-15)
 
 - Docker: add a local image with `/data` persistence and CI smoke coverage.
