@@ -1,10 +1,13 @@
 # Changelog
 
-## 0.1.4 (Unreleased)
+## 0.1.4 (2026-05-15)
 
 - Docker: add a local image with `/data` persistence and CI smoke coverage.
-- Release config: update GoReleaser archive fields to current v2 names so `goreleaser check` passes.
+- Release: add Linux arm64 artifacts, refresh GoReleaser v2 archive config, and update the Homebrew tap workflow.
 - CI: pin Go toolchain to 1.25.10 to clear current standard-library `govulncheck` advisories.
+- CI: update golangci-lint workflow and config for v2.
+- Tooling: update Go dependencies and pnpm metadata.
+- Project metadata: update copyright year to 2026.
 
 ## 0.1.3 (2025-12-17)
 
