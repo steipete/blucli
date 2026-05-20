@@ -2,6 +2,8 @@
 
 ## 0.1.5 (Unreleased)
 
+- Release: standardize archive names for target-specific Homebrew and aqua installs.
+
 ## 0.1.4 (2026-05-15)
 
 - Docker: add a local image with `/data` persistence and CI smoke coverage.
