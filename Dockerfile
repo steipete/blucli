@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 ARG VERSION=dev
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath \
-    -ldflags="-s -w -X github.com/steipete/blucli/internal/app.Version=${VERSION}" \
+    -ldflags="-s -w -X main.version=${VERSION}" \
     -o /out/blu ./cmd/blu
 
 FROM alpine:${ALPINE_VERSION}

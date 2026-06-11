@@ -15,10 +15,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build image
-        run: docker build --pull -t blucli:ci .
+        run: docker build --pull --build-arg VERSION=ci-test -t blucli:ci .
 
       - name: Smoke test image
         run: |
           set -euo pipefail
-          docker run --rm blucli:ci --version
+          test "$(docker run --rm blucli:ci --version)" = "ci-test"
           docker run --rm blucli:ci --help
