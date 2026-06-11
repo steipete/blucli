@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.1.6 (Unreleased)
+
 ## 0.1.5 (2026-06-11)
 
 - Docker: honor the `VERSION` build argument in `blu --version` and cover it in CI.
