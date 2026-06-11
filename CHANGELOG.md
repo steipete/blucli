@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.1.5 (Unreleased)
+## 0.1.5 (2026-06-11)
 
+- Docker: honor the `VERSION` build argument in `blu --version` and cover it in CI.
 - Release: standardize archive names for target-specific Homebrew and aqua installs.
+- Security: update Go dependencies and pin the Go toolchain to 1.25.11.
 
 ## 0.1.4 (2026-05-15)
 
