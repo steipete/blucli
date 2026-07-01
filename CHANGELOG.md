@@ -3,7 +3,8 @@
 ## 0.1.6 (Unreleased)
 
 - Docker: update the runtime base to Alpine 3.24.
-- Tooling: update the indirect Go tools dependency.
+- Dependencies: update Go networking/tooling modules and pnpm.
+- CI: update checkout, Go setup, and GoReleaser actions to their current major releases.
 
 ## 0.1.5 (2026-06-11)
 
