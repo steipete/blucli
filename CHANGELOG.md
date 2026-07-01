@@ -2,6 +2,9 @@
 
 ## 0.1.6 (Unreleased)
 
+- Docker: update the runtime base to Alpine 3.24.
+- Tooling: update the indirect Go tools dependency.
+
 ## 0.1.5 (2026-06-11)
 
 - Docker: honor the `VERSION` build argument in `blu --version` and cover it in CI.
