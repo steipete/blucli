@@ -1,66 +1,69 @@
-# 🫐 blucli — play, group, and automate BluOS.
+# blucli 🫐 — Pick a player, press play.
 
-BluOS CLI (`blu`) for Bluesound/NAD BluOS players.
+[![CI](https://img.shields.io/github/actions/workflow/status/steipete/blucli/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/steipete/blucli/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/steipete/blucli?style=flat-square)](https://github.com/steipete/blucli/releases/latest)
+[![Go](https://img.shields.io/badge/Go-1.25%2B-00ADD8?style=flat-square&logo=go&logoColor=white)](go.mod)
+[![License](https://img.shields.io/github/license/steipete/blucli?style=flat-square)](LICENSE)
+[![Homebrew](https://img.shields.io/badge/Homebrew-steipete%2Ftap-FBB040?style=flat-square&logo=homebrew&logoColor=black)](https://github.com/steipete/homebrew-tap)
 
-Spec: [docs/spec.md](docs/spec.md)
+`blucli` is a command-line client for discovering and controlling Bluesound and NAD players that run BluOS. It gives people and scripts access to playback, grouping, queues, presets, browsing, and diagnostics over the local network.
 
-## Install / Run
+## Install
 
-- Homebrew (installs `blu`): `brew install steipete/tap/blucli`
-- Go install: `go install github.com/steipete/blucli/cmd/blu@latest`
-- From source: `go run ./cmd/blu --help`
-- Docker: `docker build -t blucli .`
+Homebrew installs the `blu` command on macOS or Linux:
 
 ```bash
-docker run --rm --network host -v "$PWD/.blu:/data" blucli devices
-docker run --rm --network host -v "$PWD/.blu:/data" blucli --device 192.168.1.19:11000 status
+brew install steipete/tap/blucli
 ```
 
-Linux containers need host networking for discovery; otherwise pass an explicit `--device` or `BLU_DEVICE`.
+With Go 1.25 or newer:
 
-## Features
+```bash
+go install github.com/steipete/blucli/cmd/blu@latest
+```
 
-- Discovery: mDNS (`_musc/_musp/_musz/_mush`) + LSDP fallback (`blu devices`)
-- Device selection: `--device`, `BLU_DEVICE`, config `default_device`, aliases, discovery names
-- Playback: `play/pause/stop/next/prev` + `play --url/--seek/--id`
-- Volume + modes: `volume …`, `mute …`, `shuffle …`, `repeat …`
-- Grouping: `group status|add|remove`
-- Queue/presets/browse: `queue …`, `presets …`, `browse …`, `playlists …`, `inputs …`
-- TuneIn: `tunein search|play` for quick “play X”
-- Spotify Connect: `spotify open` (and optional Web API `spotify login/search/play`)
-- Sleep timer: `sleep`
-- Watch: long-poll `Status` / `SyncStatus` (`watch status|sync`)
-- Scripting/safety: `--json`, `--dry-run`, `--trace-http`
-- Diagnostics: `diag`, `doctor`, `raw` endpoint runner
-- Shell completions: `completions bash|zsh`
+Prebuilt macOS, Linux, and Windows archives are available from [GitHub Releases](https://github.com/steipete/blucli/releases/latest). For a container-based setup, see the [Docker guide](docs/usage.md#docker).
 
-## Quickstart
+## Quick start
+
+Discover players, then address one by its discovery name or `host:port`:
 
 ```bash
 blu devices
-blu --device 192.168.1.19:11000 status
+blu --device "Living Room" status
+blu --device 192.168.1.19:11000 now
 ```
+
+When discovery finds exactly one player, `blu status` selects it automatically. Otherwise, pass `--device`, set `BLU_DEVICE`, or configure a default.
+
+## Commands
+
+| Area | Commands |
+| --- | --- |
+| Discovery and status | `devices`, `status`, `now`, `watch status\|sync` |
+| Playback | `play`, `pause`, `stop`, `next`, `prev`, `shuffle`, `repeat`, `sleep` |
+| Volume and groups | `volume`, `mute`, `group` |
+| Content | `queue`, `presets`, `browse`, `playlists`, `inputs`, `tunein` |
+| Spotify | `spotify open`, plus optional Web API login, search, and playback |
+| Automation and diagnostics | `--json`, `--dry-run`, `--trace-http`, `diag`, `doctor`, `raw` |
+
+See the [usage guide](docs/usage.md) for command examples, Spotify setup, Docker, shell completions, and automation notes. The [protocol and implementation spec](docs/spec.md) documents discovery, BluOS endpoints, CLI behavior, and the project layout.
 
 ## Device selection
 
-`blu` picks a target device in this order:
+`blu` resolves a target in this order:
 
-1. `--device <id|name|alias>` (e.g. `192.168.1.19:11000` or `Schlafzimmer`)
+1. `--device <host:port|name|alias>`
 2. `BLU_DEVICE`
-3. config `default_device`
-4. discovery cache / live discovery (only if exactly 1 device)
+3. `default_device` in the config file
+4. the discovery cache, when it contains exactly one player
+5. live discovery, when it finds exactly one player
 
-If multiple devices exist, run `blu devices` and pick one.
+Run `blu devices` to refresh the cache. Discovery names work directly; aliases are useful for custom shortcuts or disambiguation.
 
-## Config (aliases)
+## Configuration
 
-You can also target a player by its discovery name (shown by `blu devices`) without writing a config file. Aliases are just for custom shortcuts / disambiguation.
-
-Config file:
-- macOS: `~/Library/Application Support/blu/config.json`
-- Linux: `~/.config/blu/config.json`
-
-Example:
+The default config file is `~/Library/Application Support/blu/config.json` on macOS and `~/.config/blu/config.json` on Linux. Override it with `--config <path>`.
 
 ```json
 {
@@ -72,135 +75,16 @@ Example:
 }
 ```
 
-## Common commands
-
-Playback:
-
-```bash
-blu status
-blu now
-blu play
-blu pause
-blu stop
-blu next
-blu prev
-
-# Play a stream URL
-blu play --url http://ice1.somafm.com/groovesalad-128-mp3
-```
-
-“Say a thing, play something” (TuneIn-backed):
-
-```bash
-blu tunein search "Gareth Emery"
-blu tunein play "Gareth Emery"
-blu tunein play --pick 0 "Gareth Emery"
-```
-
-Volume / repeat / shuffle:
-
-```bash
-blu volume get
-blu volume set 15
-blu volume up
-blu volume down
-blu mute on|off|toggle
-blu shuffle on|off
-blu repeat off|track|queue
-```
-
-Grouping:
-
-```bash
-blu group status
-blu group add 192.168.1.115:11000 --name "Downstairs"
-blu group remove 192.168.1.115:11000
-```
-
-Queue / presets / browse:
-
-```bash
-blu queue list
-blu presets list
-blu browse --key "TuneIn:"
-blu inputs
-```
-
-Diagnostics:
-
-```bash
-blu diag
-blu doctor
-```
-
-Power user:
-
-```bash
-blu raw /Status
-blu --dry-run --trace-http raw /Play --param url=http://ice1.somafm.com/groovesalad-128-mp3 --write
-```
-
-## Scripting + safety
-
-- `--json`: stable machine output.
-- `--dry-run`: blocks mutating requests but still allows reads; always logs request URLs.
-- `--trace-http`: also logs request URLs (useful without `--dry-run`).
-
-## Shell completions
-
-```bash
-source <(blu completions bash)
-```
-
-## Spotify notes
-
-BluOS uses Spotify Connect.
-
-Instant “switch player into Spotify”:
-
-```bash
-blu spotify open
-```
-
-Optional: Spotify Web API integration (OAuth) for `blu spotify search` / `blu spotify play`:
-
-1. Create a Spotify developer app and add a redirect URL (default): `http://127.0.0.1:8974/callback`
-2. Set `SPOTIFY_CLIENT_ID` (or pass `--client-id`)
-3. Login:
-
-```bash
-blu spotify login
-```
-
-Then:
-
-```bash
-blu spotify play "Gareth Emery"
-```
-
-Fallback: save a BluOS preset from Spotify, then `blu presets load <id>`.
-
 ## Development
 
-Go-only:
-
 ```bash
+go build -o dist/blu ./cmd/blu
 go test ./...
 golangci-lint run --timeout=5m
 ```
 
-Convenience scripts (optional):
+The repository also provides equivalent `pnpm build`, `pnpm test`, and `pnpm lint` helpers.
 
-```bash
-pnpm build
-pnpm test
-pnpm lint
-pnpm format
-pnpm blu -- status
-```
+## License
 
-## Prior work / references
-
-- BluShell (PowerShell wrapper + unofficial docs): https://github.com/albertony/blushell (no license file in repo as of 2025-12-17)
-- pyblu (Python library): https://github.com/LouisChrist/pyblu (MIT)
-- BluOS Controller.app (macOS): Electron app; inspect `app.asar` for discovery details
+[MIT](LICENSE)
