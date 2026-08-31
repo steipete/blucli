@@ -2,6 +2,7 @@
 
 ## 0.1.6 (Unreleased)
 
+- Build: use Go 1.26.6 for CI, releases, and Docker while retaining Go 1.25 source compatibility and macOS 12 support.
 - Docker: update the runtime base to Alpine 3.24.
 - Dependencies: update Go networking/tooling modules and pnpm.
 - CI: update checkout, Go setup, and GoReleaser actions to their current major releases.
