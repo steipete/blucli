@@ -2,7 +2,7 @@ module github.com/steipete/blucli
 
 go 1.25.0
 
-toolchain go1.26.6
+toolchain go1.26.8
 
 require github.com/grandcat/zeroconf v1.0.0
 
