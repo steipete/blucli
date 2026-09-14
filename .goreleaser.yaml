@@ -11,6 +11,9 @@ builds:
     binary: blu
     env:
       - CGO_ENABLED=0
+      - MACOSX_DEPLOYMENT_TARGET=12.0
+    hooks:
+      post: python3 scripts/check_macos_target.py {{ .Path }} {{ .Os }}
     ldflags:
       - -s -w -X main.version={{.Version}}
     targets:
@@ -39,8 +42,4 @@ checksum:
   name_template: checksums.txt
 
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
+  disable: true
