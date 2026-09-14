@@ -2,6 +2,8 @@
 
 ## 0.1.7 (Unreleased)
 
+- Release binaries for macOS are now Developer ID signed and notarized, so direct downloads pass Gatekeeper.
+
 ## 0.1.6 (2026-09-13)
 
 - Build: use Go 1.26.8 for CI, releases, and Docker while retaining Go 1.25 source compatibility and macOS 12 support.

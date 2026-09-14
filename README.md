@@ -22,7 +22,7 @@ With Go 1.25 or newer:
 go install github.com/steipete/blucli/cmd/blu@latest
 ```
 
-Prebuilt macOS, Linux, and Windows archives are available from [GitHub Releases](https://github.com/steipete/blucli/releases/latest). For a container-based setup, see the [Docker guide](docs/usage.md#docker).
+Prebuilt macOS, Linux, and Windows archives are available from [GitHub Releases](https://github.com/steipete/blucli/releases/latest). macOS release binaries require macOS 12 or newer and are Developer ID signed by Peter Steinberger and notarized by Apple, so direct downloads pass Gatekeeper. See the [release guide](docs/releasing.md) for checksum and signature verification. For a container-based setup, see the [Docker guide](docs/usage.md#docker).
 
 ## Quick start
 
