@@ -11,7 +11,7 @@ builds:
     binary: blu
     env:
       - CGO_ENABLED=0
-      - MACOSX_DEPLOYMENT_TARGET=12.0
+      - MACOSX_DEPLOYMENT_TARGET=13.0
     hooks:
       post: python3 scripts/check_macos_target.py {{ .Path }} {{ .Os }}
     ldflags:

@@ -2,6 +2,11 @@
 
 ## 0.1.8 (Unreleased)
 
+- Breaking: macOS release binaries now require macOS 13 Ventura or newer, matching Go 1.27's supported minimum.
+- CI: move macOS jobs and release verification to `xcode-27` and smoke-test Intel binaries with Rosetta.
+- Security: build with Go 1.27.2 to fix standard-library vulnerabilities while retaining Go 1.25 source compatibility.
+- Release: update the shared workflow pin and expose a non-publishing dry run.
+
 ## 0.1.7 (2026-09-14)
 
 ### Highlights

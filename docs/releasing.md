@@ -1,14 +1,15 @@
 # Releasing blucli
 
 Releases use `.github/workflows/release-unified.yml`, pinned to
-`openclaw/release-workflows` v1.9.0 at
-`f613cbfed2b043159c850c353e7facb8c89833b0`. The shared Go CLI archetype
+`openclaw/release-workflows` v1 at
+`fc49859568b3781af7663bee48c003fd987dc08b`. The shared Go CLI archetype
 builds with GoReleaser, signs and notarizes the macOS binaries, and verifies
-an immutable artifact independently on Intel and Apple Silicon before publishing.
+an immutable artifact independently as Intel (under Rosetta) and Apple Silicon
+on `xcode-27` before publishing.
 
 ## Release contract
 
-- macOS 12.0 or newer; both `darwin_amd64` and `darwin_arm64`.
+- macOS 13.0 or newer; both `darwin_amd64` and `darwin_arm64`.
 - Developer ID Application: Peter Steinberger (Y5PE65HELJ), with hardened runtime,
   trusted timestamp, and signing identifier `com.steipete.blucli.blu`.
 - The executable remains `blu` (`blu.exe` on Windows).
@@ -21,11 +22,24 @@ an immutable artifact independently on Intel and Apple Silicon before publishing
 
 The release builds on macOS so the GoReleaser post-build hook can inspect every
 Darwin binary with `otool -arch all -l`. `CGO_ENABLED=0` and
-`MACOSX_DEPLOYMENT_TARGET=12.0` are explicit; the hook rejects a deployment target
-other than 12.0, including toolchain-default changes. If cgo is introduced, also
-set matching `CGO_CFLAGS` and `CGO_LDFLAGS` with `-mmacosx-version-min=12.0`;
+`MACOSX_DEPLOYMENT_TARGET=13.0` are explicit; the hook rejects a deployment target
+other than 13.0, including toolchain-default changes. If cgo is introduced, also
+set matching `CGO_CFLAGS` and `CGO_LDFLAGS` with `-mmacosx-version-min=13.0`;
 the environment variable alone does not reliably constrain external linking.
 CI exercises the same build configuration and target gate without Apple secrets.
+CI, releases, and Docker use Go 1.27.2; the source minimum remains Go 1.25.
+
+## Dry run
+
+After CI passes on merged `main`, build, sign, notarize, and verify the current
+version without creating a tag, publishing a release, or updating Homebrew:
+
+```sh
+gh workflow run release-unified.yml --ref main -f version=0.1.7 -F dry_run=true
+```
+
+The version input selects artifact metadata; a dry run does not change the source
+version or changelog. Inspect all build and verification jobs before a live release.
 
 ## Repository setup
 
@@ -90,6 +104,6 @@ python3 scripts/check_macos_target.py ./blu
 
 `codesign` must report the identity and Team ID above; Gatekeeper must accept it.
 Use `otool -l ./blu` outside a source checkout and inspect `LC_BUILD_VERSION`:
-`minos` must be `12.0`. Test a quarantined download without removing its quarantine
+`minos` must be `13.0`. Test a quarantined download without removing its quarantine
 attribute. Command-line `curl` does not normally add quarantine on macOS, so a
 manual Gatekeeper test must explicitly add `com.apple.quarantine` before launch.
