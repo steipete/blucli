@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   test:
+    # Preserve the required status context; the macOS runner is xcode-27.
+    name: test (${{ matrix.os == 'xcode-27' && 'macos-latest' || matrix.os }})
     strategy:
       fail-fast: false
       matrix:
