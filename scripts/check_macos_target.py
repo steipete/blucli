@@ -1,4 +1,4 @@
-"""Require the documented macOS 12.0 minimum in every Mach-O slice."""
+"""Require the documented macOS 13.0 minimum in every Mach-O slice."""
 
 import re
 import subprocess
@@ -25,8 +25,8 @@ def check_target(load_commands):
             raise ValueError("missing or malformed macOS deployment target")
         version = tuple(map(int, match[1].split(".")))
         version += (0,) * (3 - len(version))
-        if version != (12, 0, 0):
-            raise ValueError(f"macOS {match[1]} does not match documented minimum 12.0")
+        if version != (13, 0, 0):
+            raise ValueError(f"macOS {match[1]} does not match documented minimum 13.0")
         targets.append(match[1])
     if not targets:
         raise ValueError("no macOS deployment target found")
@@ -46,7 +46,7 @@ def main():
         targets = check_target(result.stdout)
     except (OSError, subprocess.CalledProcessError, ValueError) as error:
         raise SystemExit(f"macOS release gate failed: {error}") from error
-    print(f"macOS release gate passed: minos {', '.join(targets)} == 12.0")
+    print(f"macOS release gate passed: minos {', '.join(targets)} == 13.0")
 
 
 if __name__ == "__main__":

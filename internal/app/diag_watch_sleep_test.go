@@ -3,13 +3,24 @@ package app
 import (
 	"bytes"
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 )
+
+type cancelOnWrite struct {
+	io.Writer
+	cancel context.CancelFunc
+}
+
+func (w cancelOnWrite) Write(p []byte) (int, error) {
+	n, err := w.Writer.Write(p)
+	w.cancel()
+	return n, err
+}
 
 func TestRunDiag(t *testing.T) {
 	t.Parallel()
@@ -72,10 +83,9 @@ func TestRunSleep(t *testing.T) {
 func TestRunWatchStatusCancels(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	t.Cleanup(cancel)
 
-	var once sync.Once
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/Status" {
 			http.NotFound(w, r)
@@ -83,12 +93,6 @@ func TestRunWatchStatusCancels(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/xml")
 		_, _ = w.Write([]byte(`<status state="play" volume="10" mute="0" artist="A" title1="T" etag="e1"/>`))
-		once.Do(func() {
-			go func() {
-				time.Sleep(10 * time.Millisecond)
-				cancel()
-			}()
-		})
 	}))
 	t.Cleanup(srv.Close)
 
@@ -96,7 +100,7 @@ func TestRunWatchStatusCancels(t *testing.T) {
 
 	var out bytes.Buffer
 	var errOut bytes.Buffer
-	code := Run(ctx, []string{"--config", cfgPath, "--discover=false", "watch", "status"}, &out, &errOut)
+	code := Run(ctx, []string{"--config", cfgPath, "--discover=false", "watch", "status"}, cancelOnWrite{Writer: &out, cancel: cancel}, &errOut)
 	if code != 0 {
 		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
 	}
@@ -108,10 +112,9 @@ func TestRunWatchStatusCancels(t *testing.T) {
 func TestRunWatchSyncCancels(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	t.Cleanup(cancel)
 
-	var once sync.Once
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/SyncStatus" {
 			http.NotFound(w, r)
@@ -119,12 +122,6 @@ func TestRunWatchSyncCancels(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/xml")
 		_, _ = w.Write([]byte(`<SyncStatus group="G" volume="10" mute="0" etag="x"><master port="11000">host</master></SyncStatus>`))
-		once.Do(func() {
-			go func() {
-				time.Sleep(10 * time.Millisecond)
-				cancel()
-			}()
-		})
 	}))
 	t.Cleanup(srv.Close)
 
@@ -132,7 +129,7 @@ func TestRunWatchSyncCancels(t *testing.T) {
 
 	var out bytes.Buffer
 	var errOut bytes.Buffer
-	code := Run(ctx, []string{"--config", cfgPath, "--discover=false", "watch", "sync"}, &out, &errOut)
+	code := Run(ctx, []string{"--config", cfgPath, "--discover=false", "watch", "sync"}, cancelOnWrite{Writer: &out, cancel: cancel}, &errOut)
 	if code != 0 {
 		t.Fatalf("exit code = %d; stderr=%q", code, errOut.String())
 	}
