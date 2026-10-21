@@ -77,7 +77,7 @@ The default config file is `~/Library/Application Support/blu/config.json` on ma
 
 ## Development
 
-CI and release builds use Go 1.27.2, while the source minimum remains Go 1.25.
+CI and release builds use Go 1.27.3, while the source minimum remains Go 1.25.
 macOS jobs run on the Apple Silicon `xcode-27` image and smoke-test Intel release
 binaries with Rosetta. Both macOS architectures require macOS 13.0 or newer.
 

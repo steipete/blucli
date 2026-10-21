@@ -27,7 +27,7 @@ other than 13.0, including toolchain-default changes. If cgo is introduced, also
 set matching `CGO_CFLAGS` and `CGO_LDFLAGS` with `-mmacosx-version-min=13.0`;
 the environment variable alone does not reliably constrain external linking.
 CI exercises the same build configuration and target gate without Apple secrets.
-CI, releases, and Docker use Go 1.27.2; the source minimum remains Go 1.25.
+CI, releases, and Docker use Go 1.27.3; the source minimum remains Go 1.25.
 
 ## Dry run
 
