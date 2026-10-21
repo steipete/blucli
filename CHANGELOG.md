@@ -1,7 +1,14 @@
 # Changelog
 
-## 0.1.8 (Unreleased)
+## 0.1.8 (2026-10-20)
 
+### Highlights
+
+- Fix certificate validation vulnerability GO-2026-6809 in release binaries.
+
+### Changes
+
+- Security: build with Go 1.27.3 to fix certificate validation vulnerability GO-2026-6809.
 - Breaking: macOS release binaries now require macOS 13 Ventura or newer, matching Go 1.27's supported minimum.
 - CI: move macOS jobs and release verification to `xcode-27` and smoke-test Intel binaries with Rosetta.
 - Security: build with Go 1.27.2 to fix standard-library vulnerabilities while retaining Go 1.25 source compatibility.
