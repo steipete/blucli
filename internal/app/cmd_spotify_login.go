@@ -12,13 +12,14 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/steipete/blucli/internal/config"
 	"github.com/steipete/blucli/internal/output"
 	"github.com/steipete/blucli/internal/spotify"
 )
 
-func cmdSpotifyLogin(ctx context.Context, out *output.Printer, paths config.PathSet, cfg config.Config, args []string) int {
+func cmdSpotifyLogin(ctx context.Context, out *output.Printer, paths config.PathSet, cfg config.Config, httpTimeout time.Duration, args []string) int {
 	flags := flag.NewFlagSet("spotify login", flag.ContinueOnError)
 	flags.SetOutput(out.Stderr())
 
@@ -46,8 +47,8 @@ func cmdSpotifyLogin(ctx context.Context, out *output.Printer, paths config.Path
 	}
 
 	redirectURL, err := url.Parse(strings.TrimSpace(redirect))
-	if err != nil || redirectURL.Scheme != "http" || redirectURL.Host == "" {
-		out.Errorf("spotify login: invalid redirect url: %q", redirect)
+	if err != nil || redirectURL.Scheme != "http" || redirectURL.Host == "" || redirectURL.Path == "" || !strings.HasPrefix(redirectURL.Path, "/") {
+		out.Errorf("spotify login: redirect url must include an http host and a path: %q", redirect)
 		return 2
 	}
 
@@ -142,7 +143,7 @@ func cmdSpotifyLogin(ctx context.Context, out *output.Printer, paths config.Path
 	oauth, err := spotify.NewOAuth(spotify.OAuthOptions{
 		AccountsBaseURL: strings.TrimSpace(os.Getenv("BLU_SPOTIFY_ACCOUNTS_BASE_URL")),
 		ClientID:        clientID,
-		HTTP:            http.DefaultClient,
+		HTTP:            spotifyHTTPClient(httpTimeout),
 	})
 	if err != nil {
 		out.Errorf("spotify login: %v", err)

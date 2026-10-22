@@ -57,7 +57,7 @@ func TestSpotifyLogin_SuccessRoundTrip(t *testing.T) {
 
 	done := make(chan int, 1)
 	go func() {
-		done <- cmdSpotifyLogin(ctx, out, paths, cfg, []string{"--client-id", "CID", "--redirect", redirect, "--no-open"})
+		done <- cmdSpotifyLogin(ctx, out, paths, cfg, defaultHTTPTimeout, []string{"--client-id", "CID", "--redirect", redirect, "--no-open"})
 		_ = stdoutW.Close()
 		_ = stderrW.Close()
 	}()

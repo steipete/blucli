@@ -2,6 +2,11 @@
 
 ## 0.1.9 (Unreleased)
 
+### Changes
+
+- Spotify login rejects a redirect URL that has no path, instead of panicking.
+- Spotify HTTP calls use the global `--timeout`, so a peer that accepts and then stalls cannot hang the process.
+
 ## 0.1.8 (2026-10-20)
 
 ### Highlights
