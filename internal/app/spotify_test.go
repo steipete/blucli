@@ -197,11 +197,11 @@ func TestSpotifyAccessTokenErrorsAndFastPath(t *testing.T) {
 
 	p := config.PathSet{ConfigPath: filepath.Join(t.TempDir(), "config.json")}
 
-	if _, _, err := spotifyAccessToken(context.Background(), p, config.Config{}); err == nil {
+	if _, _, err := spotifyAccessToken(context.Background(), p, config.Config{}, defaultHTTPTimeout); err == nil {
 		t.Fatalf("want error for missing client id")
 	}
 
-	if _, _, err := spotifyAccessToken(context.Background(), p, config.Config{Spotify: config.SpotifyConfig{ClientID: "cid"}}); err == nil {
+	if _, _, err := spotifyAccessToken(context.Background(), p, config.Config{Spotify: config.SpotifyConfig{ClientID: "cid"}}, defaultHTTPTimeout); err == nil {
 		t.Fatalf("want error for missing token")
 	}
 
@@ -215,12 +215,12 @@ func TestSpotifyAccessTokenErrorsAndFastPath(t *testing.T) {
 			},
 		},
 	}
-	if _, _, err := spotifyAccessToken(context.Background(), p, cfg); err == nil || !strings.Contains(err.Error(), "expired") {
+	if _, _, err := spotifyAccessToken(context.Background(), p, cfg, defaultHTTPTimeout); err == nil || !strings.Contains(err.Error(), "expired") {
 		t.Fatalf("err = %v; want expired token error", err)
 	}
 
 	cfg.Spotify.Token.ExpiresAt = time.Now().Add(2 * time.Hour)
-	tok, _, err := spotifyAccessToken(context.Background(), p, cfg)
+	tok, _, err := spotifyAccessToken(context.Background(), p, cfg, defaultHTTPTimeout)
 	if err != nil || tok != "at" {
 		t.Fatalf("tok=%q err=%v; want at nil", tok, err)
 	}

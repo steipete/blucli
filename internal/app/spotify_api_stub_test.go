@@ -86,7 +86,7 @@ func TestSpotifyDevicesSearchAndPlay_StubbedAPI(t *testing.T) {
 		var stdout bytes.Buffer
 		var stderr bytes.Buffer
 		out := output.New(output.Options{Stdout: &stdout, Stderr: &stderr})
-		code := cmdSpotifyDevices(context.Background(), out, paths, cfg, nil)
+		code := cmdSpotifyDevices(context.Background(), out, paths, cfg, defaultHTTPTimeout, nil)
 		if code != 0 {
 			t.Fatalf("devices code=%d stderr=%q", code, stderr.String())
 		}
@@ -99,7 +99,7 @@ func TestSpotifyDevicesSearchAndPlay_StubbedAPI(t *testing.T) {
 		var stdout bytes.Buffer
 		var stderr bytes.Buffer
 		out := output.New(output.Options{Stdout: &stdout, Stderr: &stderr})
-		code := cmdSpotifySearch(context.Background(), out, paths, cfg, []string{"Garrett"})
+		code := cmdSpotifySearch(context.Background(), out, paths, cfg, defaultHTTPTimeout, []string{"Garrett"})
 		if code != 0 {
 			t.Fatalf("search code=%d stderr=%q", code, stderr.String())
 		}

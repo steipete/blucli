@@ -44,7 +44,7 @@ func TestSpotifyAccessToken_RefreshPath_StubbedAccounts(t *testing.T) {
 		},
 	}
 
-	accessToken, newCfg, err := spotifyAccessToken(context.Background(), p, cfg)
+	accessToken, newCfg, err := spotifyAccessToken(context.Background(), p, cfg, defaultHTTPTimeout)
 	if err != nil {
 		t.Fatalf("err = %v", err)
 	}
@@ -77,7 +77,7 @@ func TestSpotifyLogin_Cancelled(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	out := output.New(output.Options{Stdout: &stdout, Stderr: &stderr})
-	code := cmdSpotifyLogin(ctx, out, p, cfg, []string{"--client-id", "CID", "--redirect", "http://127.0.0.1:0/callback", "--no-open"})
+	code := cmdSpotifyLogin(ctx, out, p, cfg, defaultHTTPTimeout, []string{"--client-id", "CID", "--redirect", "http://127.0.0.1:0/callback", "--no-open"})
 	if code != 1 {
 		t.Fatalf("code=%d; want 1", code)
 	}

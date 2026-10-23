@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"io"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -54,7 +53,7 @@ func cmdSpotifyPlay(ctx context.Context, out *output.Printer, paths config.PathS
 		return 1
 	}
 
-	accessToken, _, err := spotifyAccessToken(ctx, paths, cfg)
+	accessToken, _, err := spotifyAccessToken(ctx, paths, cfg, httpTimeout)
 	if err != nil {
 		out.Errorf("spotify play: %v", err)
 		return 1
@@ -78,7 +77,7 @@ func cmdSpotifyPlay(ctx context.Context, out *output.Printer, paths config.PathS
 
 	api := spotify.NewAPI(spotify.APIOptions{
 		APIBaseURL: strings.TrimSpace(os.Getenv("BLU_SPOTIFY_API_BASE_URL")),
-		HTTP:       http.DefaultClient,
+		HTTP:       spotifyHTTPClient(httpTimeout),
 	})
 
 	if spotifyDeviceID == "" {
@@ -249,7 +248,7 @@ func max0(v int) int {
 	return v
 }
 
-func spotifyAccessToken(ctx context.Context, paths config.PathSet, cfg config.Config) (string, config.Config, error) {
+func spotifyAccessToken(ctx context.Context, paths config.PathSet, cfg config.Config, httpTimeout time.Duration) (string, config.Config, error) {
 	clientID := strings.TrimSpace(cfg.Spotify.ClientID)
 	if clientID == "" {
 		clientID = strings.TrimSpace(os.Getenv("SPOTIFY_CLIENT_ID"))
@@ -280,7 +279,7 @@ func spotifyAccessToken(ctx context.Context, paths config.PathSet, cfg config.Co
 	oauth, err := spotify.NewOAuth(spotify.OAuthOptions{
 		AccountsBaseURL: strings.TrimSpace(os.Getenv("BLU_SPOTIFY_ACCOUNTS_BASE_URL")),
 		ClientID:        clientID,
-		HTTP:            http.DefaultClient,
+		HTTP:            spotifyHTTPClient(httpTimeout),
 	})
 	if err != nil {
 		return "", cfg, err

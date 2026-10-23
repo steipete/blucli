@@ -72,6 +72,8 @@ blu --dry-run --trace-http raw /Play --param url=https://samplelib.com/lib/previ
 
 ## Spotify
 
+Spotify API calls and OAuth token requests honor the global `--timeout` (default `5s`); this bounds each HTTP request, not the time spent waiting for you to authorize login. Custom login redirect URLs must include a path, for example `http://127.0.0.1:8974/callback`.
+
 BluOS exposes Spotify Connect directly:
 
 ```bash

@@ -19,7 +19,7 @@ func cmdSpotify(ctx context.Context, out *output.Printer, paths config.PathSet, 
 
 	switch args[0] {
 	case "login":
-		return cmdSpotifyLogin(ctx, out, paths, cfg, args[1:])
+		return cmdSpotifyLogin(ctx, out, paths, cfg, httpTimeout, args[1:])
 	case "logout":
 		cfg.Spotify.Token = config.SpotifyToken{}
 		if err := config.SaveConfig(paths.ConfigPath, cfg); err != nil {
@@ -43,9 +43,9 @@ func cmdSpotify(ctx context.Context, out *output.Printer, paths config.PathSet, 
 		}
 		return 0
 	case "devices":
-		return cmdSpotifyDevices(ctx, out, paths, cfg, args[1:])
+		return cmdSpotifyDevices(ctx, out, paths, cfg, httpTimeout, args[1:])
 	case "search":
-		return cmdSpotifySearch(ctx, out, paths, cfg, args[1:])
+		return cmdSpotifySearch(ctx, out, paths, cfg, httpTimeout, args[1:])
 	case "play":
 		return cmdSpotifyPlay(ctx, out, paths, cfg, cache, deviceArg, allowDiscover, discoverTimeout, httpTimeout, dryRun, trace, args[1:])
 	default:
