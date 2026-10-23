@@ -63,7 +63,7 @@ Run `blu devices` to refresh the cache. Discovery names work directly; aliases a
 
 ## Configuration
 
-The default config file is `~/Library/Application Support/blu/config.json` on macOS and `~/.config/blu/config.json` on Linux. Override it with `--config <path>`.
+The default config file is `~/Library/Application Support/blu/config.json` on macOS and `~/.config/blu/config.json` on Linux. Override it with `--config <path>`. Configuration can contain Spotify tokens; new and rewritten files have user-only permissions on systems with POSIX permissions.
 
 ```json
 {
