@@ -36,6 +36,7 @@ jobs:
       # Run the GoReleaser post-build otool gate on the actual release binaries.
       build-runner: macos
       strict-checks: true
+      require-signed-tag: true
       ci-check-events: '["push","pull_request"]'
     secrets:
       MACOS_SIGNING_P12: ${{ secrets.MACOS_SIGN_P12 }}

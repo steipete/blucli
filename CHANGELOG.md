@@ -1,13 +1,14 @@
 # Changelog
 
-## 0.1.9 (Unreleased)
+## 0.1.9 (2026-10-23)
+
+**Highlights:** Spotify login and requests fail safely, and saved configuration and tokens use user-only permissions.
 
 ### Changes
 
+- Security: save configuration and Spotify tokens with user-only file permissions, including updates to existing files.
 - Spotify login rejects a redirect URL that has no path, instead of panicking. Thanks @SebTardif.
 - Spotify HTTP calls use the global `--timeout`, so a peer that accepts and then stalls cannot hang the process. Thanks @SebTardif.
-
-- Security: save configuration and Spotify tokens with user-only file permissions, including updates to existing files.
 
 ## 0.1.8 (2026-10-20)
 
