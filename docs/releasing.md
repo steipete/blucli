@@ -78,9 +78,13 @@ The independent verifiers do not receive signing or release-write credentials.
    gh workflow run release-unified.yml --ref main -f version=0.1.7
    ```
 
-   The workflow creates the annotated tag at the frozen protected commit. Do not
-   create or move the tag manually. Retries reuse that tag; investigate failures
-   before rerunning. The release body is the exact dated changelog section.
+   First run the workflow with `-F dry_run=true` and require all verification jobs
+   to pass. Create an annotated tag at that exact protected commit, signed with
+   the fleet release key. Verify it with `git -c gpg.format=ssh -c
+   gpg.ssh.allowedSignersFile=.github/release-allowed-signers verify-tag <tag>`
+   before pushing it. Then dispatch the live workflow above; it requires and
+   reuses the verified tag. Never move an existing tag. Investigate failures
+   before retrying. The release body is the exact dated changelog section.
 4. Verify the release assets, checksums, macOS signatures and execution, Go proxy,
    and Homebrew formula. Review and merge the generated closeout PR, naming the
    next section `## <next-patch> (Unreleased)` to match this repository.
