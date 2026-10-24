@@ -1,5 +1,7 @@
 # Changelog
 
+## Unreleased
+
 ## 0.1.9 (2026-10-23)
 
 **Highlights:** Spotify login and requests fail safely, and saved configuration and tokens use user-only permissions.
