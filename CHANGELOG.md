@@ -2,6 +2,10 @@
 
 ## 0.1.10 (Unreleased)
 
+### Changes
+
+- Discovery sends the seven LSDP queries at 0, 1, 2, 3, 5, 7, and 10 seconds, with millisecond jitter. Each send refreshes the UDP write deadline, so a longer `--discover-timeout` still broadcasts the later queries.
+
 ## 0.1.9 (2026-10-23)
 
 **Highlights:** Spotify login and requests fail safely, and saved configuration and tokens use user-only permissions.

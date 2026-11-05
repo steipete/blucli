@@ -37,28 +37,11 @@ func discoverLSDP(ctx context.Context) ([]Device, error) {
 
 	_ = conn.SetReadBuffer(1 << 20)
 	_ = conn.SetWriteBuffer(1 << 20)
-	_ = conn.SetDeadline(time.Now().Add(2 * time.Second))
 
 	broadcastIPs := interfaceBroadcastIPs()
-
 	query := buildLSDPQueryAll()
 	// Startup timing per doc: 7 packets at [0,1,2,3,5,7,10]s + random.
-	delays := []time.Duration{0, time.Second, 2 * time.Second, 3 * time.Second, 5 * time.Second, 7 * time.Second, 10 * time.Second}
-
-	go func() {
-		for _, d := range delays {
-			timer := time.NewTimer(d + time.Duration(rand250ms()))
-			select {
-			case <-ctx.Done():
-				timer.Stop()
-				return
-			case <-timer.C:
-				for _, dst := range broadcastIPs {
-					_, _ = conn.WriteToUDP(query, &net.UDPAddr{IP: dst, Port: port})
-				}
-			}
-		}
-	}()
+	go sendLSDPQueries(ctx, conn, port, query, broadcastIPs, lsdpSendHooks{})
 
 	seen := map[string]Device{}
 	buf := make([]byte, 2048)
@@ -342,7 +325,83 @@ func parsePort(s string) (int, error) {
 	return p, nil
 }
 
+// lsdpQueryConn is the UDP surface used to broadcast LSDP queries.
+// *net.UDPConn implements it.
+type lsdpQueryConn interface {
+	SetWriteDeadline(t time.Time) error
+	WriteToUDP(b []byte, addr *net.UDPAddr) (int, error)
+}
+
+// lsdpSendHooks replaces the clock in tests. Zero values use real time.
+type lsdpSendHooks struct {
+	now          func() time.Time
+	wait         func(context.Context, time.Duration) error
+	jitterMillis func() int
+}
+
+func (h lsdpSendHooks) withDefaults() lsdpSendHooks {
+	if h.now == nil {
+		h.now = time.Now
+	}
+	if h.wait == nil {
+		h.wait = waitLSDP
+	}
+	if h.jitterMillis == nil {
+		h.jitterMillis = rand250ms
+	}
+	return h
+}
+
+func waitLSDP(ctx context.Context, d time.Duration) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if d < 0 {
+		d = 0
+	}
+	timer := time.NewTimer(d)
+	select {
+	case <-ctx.Done():
+		timer.Stop()
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func lsdpQueryOffsets() []time.Duration {
+	return []time.Duration{
+		0,
+		time.Second,
+		2 * time.Second,
+		3 * time.Second,
+		5 * time.Second,
+		7 * time.Second,
+		10 * time.Second,
+	}
+}
+
+// sendLSDPQueries broadcasts query at 0s, 1s, 2s, 3s, 5s, 7s, and 10s from
+// the start of the call. Each offset gets up to 249ms of jitter.
+// The write deadline is refreshed before every send because SetReadDeadline
+// does not restore an expired write deadline.
+func sendLSDPQueries(ctx context.Context, conn lsdpQueryConn, port int, query []byte, dsts []net.IP, hooks lsdpSendHooks) {
+	hooks = hooks.withDefaults()
+	start := hooks.now()
+	for _, offset := range lsdpQueryOffsets() {
+		jitter := time.Duration(hooks.jitterMillis()) * time.Millisecond
+		waitFor := offset + jitter - hooks.now().Sub(start)
+		if err := hooks.wait(ctx, waitFor); err != nil {
+			return
+		}
+		_ = conn.SetWriteDeadline(hooks.now().Add(2 * time.Second))
+		for _, dst := range dsts {
+			_, _ = conn.WriteToUDP(query, &net.UDPAddr{IP: dst, Port: port})
+		}
+	}
+}
+
 func rand250ms() int {
-	// Small, deterministic-ish jitter.
+	// Small, deterministic-ish jitter. The value is a millisecond count.
 	return int(time.Now().UnixNano() % int64(250*time.Millisecond/time.Millisecond))
 }
