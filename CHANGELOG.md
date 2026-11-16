@@ -1,11 +1,13 @@
 # Changelog
 
-## 0.1.10 (Unreleased)
+## 0.1.10 (2026-11-15)
+
+**Highlights:** Player discovery now sends every scheduled LSDP query reliably, and release binaries include the Go security fix for GO-2026-6859.
 
 ### Changes
 
-- Security: build with Go 1.27.4 to address GO-2026-6859 while retaining Go 1.25 source compatibility.
 - Discovery sends the seven LSDP queries at 0, 1, 2, 3, 5, 7, and 10 seconds, with millisecond jitter. Each send refreshes the UDP write deadline, so a longer `--discover-timeout` still broadcasts the later queries. Thanks @SebTardif.
+- Security: build with Go 1.27.4 to address GO-2026-6859 while retaining Go 1.25 source compatibility.
 
 ## 0.1.9 (2026-10-23)
 
