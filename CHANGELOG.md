@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.11 (Unreleased)
 
 ## 0.1.10 (2026-11-15)
 
