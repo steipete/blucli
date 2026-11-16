@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.1.11 (Unreleased)
+
 ## 0.1.10 (2026-11-15)
 
 **Highlights:** Player discovery now sends every scheduled LSDP query reliably, and release binaries include the Go security fix for GO-2026-6859.
